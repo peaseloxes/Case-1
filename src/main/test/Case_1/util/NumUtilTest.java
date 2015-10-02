@@ -26,7 +26,7 @@ public class NumUtilTest extends TestCase {
     @Test
     public void testFiftyFifty() throws Exception {
         for (int i = 0; i < amountOfTests; i++) {
-            int count = 10;
+            int count = 100;
             boolean success = false;
             while (count > 0) {
                 if (NumUtil.fiftyFifty()) {
@@ -35,7 +35,7 @@ public class NumUtilTest extends TestCase {
                 count--;
             }
             if (!success) {
-                fail("Not one truth was generated in 10 tries with the fifty fifty util");
+                fail("Not one truth was generated in 100 tries with the fifty fifty util");
             }
         }
 
@@ -44,7 +44,7 @@ public class NumUtilTest extends TestCase {
     @Test
     public void testOneInTen() throws Exception {
         for (int i = 0; i < amountOfTests; i++) {
-            int count = 100;
+            int count = 1000;
             boolean success = false;
             while (count > 0) {
                 if (NumUtil.oneInTen()) {
@@ -53,7 +53,7 @@ public class NumUtilTest extends TestCase {
                 count--;
             }
             if (!success) {
-                fail("Not one truth was generated in 100 tries with the one in ten util");
+                fail("Not one truth was generated in 1000 tries with the one in ten util");
             }
         }
     }

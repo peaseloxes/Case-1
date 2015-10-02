@@ -11,11 +11,10 @@ public class StrUtil {
     /**
      * Returns a string filled with random characters.
      *
-     * @param length an indication of length, the number of bits
+     * @param bits the number of bits used in the generation
      * @return a random string
      */
-    public static String randomString(final int length){
-        Random random = new Random();
-        return new BigInteger(length, random).toString(32);
+    public static String randomString(final int bits) {
+        return new BigInteger(bits, new Random()).toString(32);
     }
 }
