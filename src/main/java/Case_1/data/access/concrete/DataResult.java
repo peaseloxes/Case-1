@@ -20,8 +20,6 @@ import java.util.*;
  */
 public class DataResult {
 
-    // TODO Design pattern: adapter? facade?
-
     // Easier to read than List<Map<String,Object>>
     private List<Row> data = new ArrayList<>();
 

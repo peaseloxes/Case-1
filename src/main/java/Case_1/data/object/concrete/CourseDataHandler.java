@@ -6,8 +6,6 @@ import Case_1.data.access.concrete.DataResult;
 import Case_1.data.access.concrete.SQLQuery;
 import Case_1.data.object.abs.DataHandler;
 import Case_1.domain.Course;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Generated.
@@ -18,10 +16,6 @@ import org.apache.logging.log4j.Logger;
 public class CourseDataHandler implements
         DataHandler<DataConnection, Course> {
 
-    private static final Logger LOGGER = LogManager
-            .getLogger(CourseDataHandler.class.getName());
-
-    // TODO fix this ugliness, should be DataConnection interface
     private DataConnection connection;
 
     public CourseDataHandler(final DataConnection connection) {
@@ -43,7 +37,6 @@ public class CourseDataHandler implements
             query.setSql(sql);
             query.addParam(id, SQLQuery.Type.INT);
 
-            // TODO remove casting somehow
             DataResult result = connection.execute(query);
 
             if (!result.isEmpty()) {
@@ -60,7 +53,6 @@ public class CourseDataHandler implements
             //
             // connection.execute() will close on its own if
             // exception is encountered
-            e.printStackTrace();
         }
         return course;
     }

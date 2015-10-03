@@ -46,6 +46,9 @@ public class OracleDataConnectionTest {
     @Before
     public void setUp() throws SQLException {
 
+        // TODO clean up mess below, move to utility class?
+        // see same stuff in CourseRepositoryTest
+
         try {
             PrefUtil.setPropertiesFileName("config.properties");
         } catch (IOException | PrefUtil.PropertyNotFoundException e) {
