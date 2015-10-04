@@ -8,6 +8,7 @@ import org.junit.rules.ExpectedException;
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -22,11 +23,14 @@ public class PrefUtilTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
+    private static final String VALID_TEST_CONFIG_FILE = "testconfig.properties";
+    private static final String VALID_TEST_MISSING_CONFIG_FILE = "testconfigmissing.properties";
+
     @Before
     public void setUp() throws Exception {
         // change the properties to the test properties file
         // so we know what to expect
-        PrefUtil.setPropertiesFileName("testconfig.properties");
+        PrefUtil.setPropertiesFileName(VALID_TEST_CONFIG_FILE);
     }
 
 
@@ -35,7 +39,9 @@ public class PrefUtilTest {
     public void testSetPropertiesFileName() throws Exception {
 
         // test a correct properties file
-        PrefUtil.setPropertiesFileName("testconfig.properties");
+        PrefUtil.setPropertiesFileName(VALID_TEST_CONFIG_FILE);
+
+        assertThat(PrefUtil.getPropertiesFileName(), is(VALID_TEST_CONFIG_FILE));
 
         // test a non existent properties file
         thrown.expect(IOException.class);
@@ -44,6 +50,8 @@ public class PrefUtilTest {
 
     @Test
     public void testProperties() throws Exception {
+
+        assertThat(PrefUtil.getPROPERTIES(), notNullValue());
 
         // first test the pre-built properties
         assertThat(Property.DB_URL.toString(), is
@@ -63,11 +71,13 @@ public class PrefUtilTest {
     @Test
     public void testMissingProperties() throws Exception {
 
-        // expect an error because locale can not be read from this file
+        // expect an error because property can not be read from this file
         // use a normal try-catch because we want to continue the test
         // beyond this point
         try {
-            PrefUtil.setPropertiesFileName("testconfigmissing.properties");
+            PrefUtil.setPropertiesFileName(VALID_TEST_MISSING_CONFIG_FILE);
+
+            PrefUtil.getProperty("does not exist");
 
             fail("PropertyNotFoundException expected");
         }catch (PrefUtil.PropertyNotFoundException e){

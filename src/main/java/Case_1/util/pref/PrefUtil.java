@@ -1,6 +1,7 @@
 package Case_1.util.pref;
 
 import Case_1.util.i18n.LangUtil;
+import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,11 +20,13 @@ public class PrefUtil {
     private static final Logger LOGGER = LogManager.getLogger(PrefUtil.class
             .getName());
 
+    @Getter
     private static final Properties PROPERTIES = new Properties();
 
     /**
      * The default properties file.
      */
+    @Getter
     private static String propertiesFileName = "config.properties";
 
     static {
@@ -35,7 +38,7 @@ public class PrefUtil {
             // set locale based on properties
             setLocale();
 
-        } catch (IOException | PropertyNotFoundException e) {
+        } catch (IOException e) {
 
             // warn user via log message
             LOGGER.error(LangUtil.labelFor("error.properties.notFound"));
@@ -106,12 +109,11 @@ public class PrefUtil {
     /**
      * Sets the locale based on the properties file.
      */
-    private static void setLocale() throws PropertyNotFoundException {
+    private static void setLocale() {
         try {
             LangUtil.setLocale(PrefUtil.getProperty("locale"));
         } catch (PropertyNotFoundException e) {
             LangUtil.setDefaultLocale();
-            throw new PropertyNotFoundException();
         }
     }
 

@@ -5,7 +5,7 @@ import Case_1.data.access.concrete.OracleDataConnection;
 import Case_1.data.access.concrete.SQLQuery;
 import Case_1.data.logic.abs.DataSource;
 import Case_1.data.object.concrete.CourseDataHandler;
-import Case_1.domain.Course;
+import Case_1.domain.concrete.Course;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,17 +38,11 @@ public class CourseRepositoryTest {
     @BeforeClass
     public static void setItAllUp() throws Exception {
 
-//        mockResultSet = mock(ResultSet.class);
-//        Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-//        when(mockResultSet.getString("name")).thenReturn("Course_1");
-//        when(mockResultSet.getInt("id")).thenReturn(1);
-//
-//        mockEmptyResultSet = mock(ResultSet.class);
-//        when(mockEmptyResultSet.next()).thenReturn(false);
-
         Map<String, Object> map = new HashMap<>();
-        map.put("name","Course_1");
-        map.put("id",1);
+        map.put("name", "Course_1");
+        map.put("id", 1);
+        map.put("applicants", 10);
+        map.put("duration", 5);
         filledResult = new DataResult();
         filledResult.addNewRow(map);
 
@@ -57,7 +51,8 @@ public class CourseRepositoryTest {
         mock = mock(OracleDataConnection.class);
         when(mock.open()).thenReturn(true);
         when(mock.close()).thenReturn(true);
-        when(mock.execute(any(SQLQuery.class))).thenReturn(filledResult).thenReturn(emptyResult);
+        when(mock.execute(any(SQLQuery.class))).thenReturn(filledResult)
+                .thenReturn(emptyResult);
 
         repository = new CourseRepository(
                 new DataSource<>(new CourseDataHandler(mock)));
@@ -71,6 +66,9 @@ public class CourseRepositoryTest {
 
         // assert its id is indeed 1
         assertThat(result.getId(), is(1));
+        assertThat(result.getTitle(), is("Course_1"));
+        assertThat(result.getMaxApplicants(), is(10));
+        assertThat(result.getDurationDays(), is(5));
 
         // get a result that does not exist
         result = repository.getById(2);

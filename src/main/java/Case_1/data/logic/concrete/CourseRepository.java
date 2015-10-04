@@ -2,7 +2,7 @@ package Case_1.data.logic.concrete;
 
 import Case_1.data.logic.abs.DataSource;
 import Case_1.data.logic.abs.Repository;
-import Case_1.domain.Course;
+import Case_1.domain.concrete.Course;
 
 import java.util.List;
 
@@ -24,11 +24,11 @@ public class CourseRepository extends Repository<Course> {
     }
 
     /**
-     * Finds courses with names matching <b>name</b>.
+     * Finds courses with names matching <b>title</b>.
      * <p/>
      * Will return an empty list if no matches are found.
      *
-     * @param name the name to match on
+     * @param name the title to match on
      * @return courses where the names match
      */
     public List<Course> findCoursesWithNameLike(final String name) {

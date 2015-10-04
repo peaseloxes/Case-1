@@ -5,7 +5,7 @@ import Case_1.data.access.abs.DataConnectionException;
 import Case_1.data.access.concrete.DataResult;
 import Case_1.data.access.concrete.SQLQuery;
 import Case_1.data.object.abs.DataHandler;
-import Case_1.domain.Course;
+import Case_1.domain.concrete.Course;
 
 /**
  * Generated.
@@ -42,11 +42,15 @@ public class CourseDataHandler implements
             if (!result.isEmpty()) {
                 course = new Course(
                         (Integer)result.getRow(0).get("id"),
-                        (String)result.getRow(0).get("name"));
+                        (String)result.getRow(0).get("name"),
+                        (String)result.getRow(0).get("code"),
+                        (Integer)result.getRow(0).get("duration"),
+                        (Integer)result.getRow(0).get("applicants"),
+                        null);
             }
             connection.close();
-        } catch (DataConnectionException e) {
-            // will only throw exception on opening or closing:
+        } catch (DataConnectionException | NullPointerException e) {
+            // will only throw DataConnection exception on opening or closing:
             // if on opening, there's no connection to be closed
             // if on closing no sense in trying again
             // hence no finally with connection.close()
