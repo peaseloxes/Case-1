@@ -39,6 +39,29 @@ public class CourseRepository extends Repository<Course> {
     }
 
     /**
+     * Get all courses.
+     *
+     * @return all known courses
+     */
+    public List<Course> getAll() {
+        return getDataSource()
+                .getAll();
+    }
+
+    /**
+     * Get all courses.
+     *
+     * @param start starting from
+     * @return all courses starting from <b>start</b>
+     */
+    public List<Course> getAll(final int start) {
+        return getDataSource()
+                .getAll(start);
+    }
+
+
+
+    /**
      * Adds a course to the datasource of this repository.
      *
      * @param course the course to add
@@ -46,5 +69,12 @@ public class CourseRepository extends Repository<Course> {
      */
     public boolean addCourse(final Course course) {
         return getDataSource().add(course);
+    }
+
+    public boolean addAll(final List<Course> list) {
+        for(Course course : list) {
+            addCourse(course);
+        }
+        return true;
     }
 }

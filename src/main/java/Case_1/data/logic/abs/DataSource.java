@@ -47,7 +47,7 @@ public class DataSource<T> {
         return null;
     }
 
-    public boolean add(T object) {
+    public boolean add(final T object) {
         return handler.add(object);
     }
 }

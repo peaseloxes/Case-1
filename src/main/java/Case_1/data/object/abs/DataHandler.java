@@ -26,8 +26,10 @@ public interface DataHandler<C, T> {
 
     /**
      * Adds an item.
+     *
      * @param item the item to add
      * @return true if successful
      */
-    boolean add (T item);
+    boolean add(T item);
+
 }

@@ -74,9 +74,10 @@ public class CourseDataHandler implements
                     "values (?,?,?,?,?)";
             SQLQuery query = new SQLQuery();
             query.setSql(sql);
-            query.addParam(course.getId(), SQLQuery.Type.INT);
+            query.addParam("SEQ_COURSE.NEXTVAL", SQLQuery.Type.INT);
             query.addParam(course.getCode(), SQLQuery.Type.STRING);
             query.addParam(course.getTitle(), SQLQuery.Type.STRING);
+            // TODO int = int object
             query.addParam(course.getDurationDays(), SQLQuery.Type.INT);
             query.addParam(course.getMaxApplicants(), SQLQuery.Type.INT);
             response = connection.executeUpdate(query);

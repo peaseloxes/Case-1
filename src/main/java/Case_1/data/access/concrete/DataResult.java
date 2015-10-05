@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * Encapsulates a result retrieved when using a DataConnection implementation.
- * <p/>
+ * <p>
  * For instance a {@linkplain java.sql.ResultSet ResultSet} would be
  * converted to DataResult so that
  * {@linkplain Case_1.data.object.abs.DataHandler DataHandler}
@@ -75,6 +75,17 @@ public class DataResult {
 
     public void addNewRow(final Map<String, Object> map) {
         data.add(new Row(map));
+    }
+
+    public <T> List<T> valuesToList(final int row) {
+        List<T> list = new LinkedList<>(); // preserve order
+        Map<String, Object> map = data.get(row).getValues();
+
+        for (String key : map.keySet()) {
+            list.add((T) map.get(key));
+        }
+
+        return list;
     }
 
     @AllArgsConstructor

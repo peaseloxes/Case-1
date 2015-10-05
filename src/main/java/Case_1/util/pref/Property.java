@@ -17,6 +17,27 @@ import lombok.Getter;
 public enum Property {
 
     /**
+     * Returns the name for the start parameter.
+     */
+    REST_START("start") {
+        @Override
+        protected String getResponse()
+                throws PrefUtil.PropertyNotFoundException {
+            return PrefUtil.getProperty("rest_variable_start");
+        }
+    },
+
+    /**
+     * Returns the name for the limit parameter.
+     */
+    REST_LIMIT("limit") {
+        @Override
+        protected String getResponse()
+                throws PrefUtil.PropertyNotFoundException {
+            return PrefUtil.getProperty("rest_variable_limit");
+        }
+    },
+    /**
      * Returns the connection url for the database driver.
      */
     DB_URL("jdbc:oracle:thin:@localhost:1521:XE") {
