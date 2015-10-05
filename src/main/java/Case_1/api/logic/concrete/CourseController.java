@@ -1,6 +1,7 @@
 package Case_1.api.logic.concrete;
 
 import Case_1.api.logic.abs.RestController;
+import Case_1.api.util.RestUtil;
 import Case_1.data.access.abs.DataConnectionException;
 import Case_1.data.access.concrete.DataResult;
 import Case_1.data.access.concrete.InputStreamDataConnection;
@@ -10,6 +11,7 @@ import Case_1.data.logic.concrete.CourseRepository;
 import Case_1.data.object.concrete.CourseDataHandler;
 import Case_1.domain.concrete.Course;
 import Case_1.logic.concrete.CourseParser;
+import Case_1.util.i18n.LangUtil;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.ws.rs.Consumes;
@@ -27,6 +29,11 @@ import java.util.List;
 @Path(CourseController.ROOT)
 @Produces("application/json")
 public class CourseController extends RestController<CourseRepository> {
+    private CourseRepository repository;
+
+    public CourseController(final CourseRepository repository){
+        this.repository = repository;
+    }
 
     // for use in @Path
     protected static final String ROOT = "/courses";
@@ -55,19 +62,21 @@ public class CourseController extends RestController<CourseRepository> {
         } catch (CourseParser.CourseParsingException e) {
             e.printStackTrace();
         }
-        return null;
-
+        return RestUtil.buildMessageResponse(LangUtil.labelFor("success.courses.created"));
     }
 
     @Override
     protected CourseRepository getRepository() {
-        return new CourseRepository(
-                new DataSource<Course>(
-                        new CourseDataHandler(
-                                new OracleDataConnection()
-                        )
-                )
-        );
+        if(repository==null) {
+            repository = new CourseRepository(
+                    new DataSource<Course>(
+                            new CourseDataHandler(
+                                    new OracleDataConnection()
+                            )
+                    )
+            );
+        }
+        return repository;
     }
 
     @Override

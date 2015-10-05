@@ -77,6 +77,7 @@ public class OracleDataConnection implements
             PreparedStatement statement = connection.prepareStatement(
                     query.getSql()
             );
+            statement.setEscapeProcessing(true);
             int count = 1;
             Iterator<SQLQuery.Param> it = query.getIterator();
             while (it.hasNext()) {
@@ -119,6 +120,7 @@ public class OracleDataConnection implements
             PreparedStatement statement = connection.prepareStatement(
                     query.getSql()
             );
+            statement.setEscapeProcessing(true);
             int count = 1;
             Iterator<SQLQuery.Param> it = query.getIterator();
             while (it.hasNext()) {

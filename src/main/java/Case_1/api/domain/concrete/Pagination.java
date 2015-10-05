@@ -13,8 +13,8 @@ import java.util.List;
 @Getter
 @Setter
 public class Pagination<T> {
-    private String prev;
-    private String next;
+    private String prev = "";
+    private String next = "";
     private List<T> elements = new LinkedList<>();
 
     public Pagination() {
@@ -26,13 +26,7 @@ public class Pagination<T> {
         if(elements == null) {
             elements = new LinkedList<>();
         }
-        if (start == 0) {
-            setPrev("");
-        }
 
-        if (limit == 0) {
-            setNext("");
-        }
 
         if (start > limit) {
             setPrev(url + "?" + Property.REST_START + "=" + (start
@@ -43,5 +37,14 @@ public class Pagination<T> {
         }
         setNext(url + "?start=" + (start +
                 limit) + "&limit=" + limit);
+
+        // override in case of 0 values
+        if (start == 0) {
+            setPrev("");
+        }
+
+        if (limit == 0) {
+            setNext("");
+        }
     }
 }

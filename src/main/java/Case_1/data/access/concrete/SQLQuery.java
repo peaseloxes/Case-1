@@ -55,11 +55,12 @@ public class SQLQuery {
     }
 
     public enum Type {
+        // see
+        // https://docs.oracle.com/cd/A87860_01/doc/java.817/a83724/basic3.htm
         INT(Types.INTEGER),
         STRING(Types.VARCHAR),
         DOUBLE(Types.DOUBLE),
-        DECIMAL(Types.DECIMAL),
-        BOOLEAN(Types.BOOLEAN),
+        BOOLEAN(Types.BIT),
         DATE(Types.DATE);
 
         @Getter(AccessLevel.PRIVATE)

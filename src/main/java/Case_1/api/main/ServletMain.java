@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * Created by alex on 10/5/15.
  */
-public class ServletMain  implements ServletContextListener {
+public class ServletMain implements ServletContextListener {
     private static final Logger LOGGER = LogManager.getLogger(ServletMain.class.getName());
 
 

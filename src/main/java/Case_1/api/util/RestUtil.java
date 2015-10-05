@@ -20,4 +20,8 @@ public class RestUtil {
         return Response.ok(gson.toJson(pageModel)).build();
     }
 
+    public static Response buildMessageResponse(final String message) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        return Response.ok(gson.toJson(message)).build();
+    }
 }
