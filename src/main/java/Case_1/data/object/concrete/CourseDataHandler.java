@@ -40,6 +40,7 @@ public class CourseDataHandler implements
             DataResult result = connection.execute(query);
 
             if (!result.isEmpty()) {
+                // TODO use builder
                 course = new Course(
                         (Integer)result.getRow(0).get("id"),
                         (String)result.getRow(0).get("name"),

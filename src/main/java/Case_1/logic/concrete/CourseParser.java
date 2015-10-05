@@ -24,6 +24,7 @@ public class CourseParser {
     private static String courseFileCode;
     private static String courseFileDuration;
     private static String courseFileStartDate;
+    private static String courseFileDurationDayIndicator;
 
     /**
      * Note, courses <b>in this list</b> will be unique.
@@ -51,6 +52,11 @@ public class CourseParser {
         int i = 0;
         while (i < lines.size()) {
 
+            if (lines.get(i).equals("")) {
+                // TODO use case validate
+                throw new CourseParsingException("unexpected new line");
+            }
+
             // line 1 of 5 > title
             final String title = extractTitle(lines.get(i));
 
@@ -69,7 +75,15 @@ public class CourseParser {
             // line 5 of 5 > save
             try {
                 CourseBuilder builder = CourseBuilder.getInstance();
+                // TODO ensure uniquenessnessness
 
+                builder.id(i)
+                        .title(title)
+                        .maxApplicants(5)
+                        .code(code)
+                        .duration(duration)
+                        .instance(i, startDate, startDate.plusDays(duration - 1), 0D)
+                        .create();
 
                 courseList.add(builder.create());
             } catch (IncorrectVariablesException e) {
@@ -78,8 +92,9 @@ public class CourseParser {
                 // for now just throw a hissyfit
                 throw new CourseParsingException("ruh roh");
             }
+
             // at the end in case the section does not end with a newline
-            i++;
+            i += 2;
         }
         return courseList;
     }
@@ -161,12 +176,14 @@ public class CourseParser {
 
         final String[] placeholders = new String[]{
                 "{duration}",
-                "{separator}{space}"
+                "{separator}{space}",
+                "{space}{days}"
         };
 
         final String[] occurrences = new String[]{
                 courseFileDuration,
-                courseFileSeparator + " "
+                courseFileSeparator + " ",
+                " " + courseFileDurationDayIndicator
         };
 
         // replace occurrences with placeholders
@@ -179,12 +196,12 @@ public class CourseParser {
         String cleanDuration = replace(
                 dirtyDuration,
                 placeholders,
-                new String[]{"", ""});
+                new String[]{"", "", ""});
 
         int duration; // default to 0 ok?
-        try{
+        try {
             duration = Integer.valueOf(cleanDuration);
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             // TODO use case validation etc.
             throw new CourseParsingException("duration not a number");
         }
@@ -216,14 +233,30 @@ public class CourseParser {
                 placeholders,
                 new String[]{"", ""});
 
-        LocalDateTime duration = null;
-        try{
-            //duration = LocalDateTime.(cleanDate);
-        } catch(NumberFormatException e) {
-            // TODO use case validation etc.
-            throw new CourseParsingException("duration not a number");
+        try {
+            String[] sploded = cleanDate.split("/");
+
+            try {
+                assert (sploded.length == 3);
+            } catch (AssertionError e) {
+                throw new CourseParsingException("date wrong");
+            }
+
+            int day = Integer.valueOf(sploded[0]);
+            int month = Integer.valueOf(sploded[1]);
+            int year = Integer.valueOf(sploded[2]);
+
+            LocalDateTime duration = LocalDateTime.of(
+                    year,
+                    month,
+                    day,
+                    0,
+                    0
+            );
+            return duration;
+        } catch (Exception e) {
+            throw new CourseParsingException("date wrong");
         }
-        return duration;
     }
 
     /**
@@ -292,6 +325,7 @@ public class CourseParser {
         courseFileTitle = PrefUtil.getProperty("course_file_title");
         courseFileCode = PrefUtil.getProperty("course_file_code");
         courseFileDuration = PrefUtil.getProperty("course_file_duration");
+        courseFileDurationDayIndicator = PrefUtil.getProperty("course_file_duration_day_indicator");
         courseFileStartDate = PrefUtil.getProperty("course_file_start_date");
     }
 

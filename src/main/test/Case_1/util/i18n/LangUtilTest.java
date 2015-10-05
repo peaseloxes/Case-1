@@ -33,11 +33,14 @@ public class LangUtilTest {
 
     @Test
     public void testSetLocale() throws Exception {
-        // set to default Locale
-        LangUtil.setLocale("nl_NL");
+        // set to locale
+        LangUtil.setLocale("nl");
 
-        // test that bundle is now in default locale
-        assertThat(LangUtil.getBundle().getLocale(), is(new Locale("nl_NL")));
+        ResourceBundle bundle = LangUtil.getBundle();
+
+        // test that bundle is now in locale
+        assertThat(LangUtil.getBundle().getLocale(),
+                is(new Locale("nl")));
     }
 
     @Test
@@ -51,7 +54,7 @@ public class LangUtilTest {
 
         // bundle is in language specified by testconfig.properties
         assertThat(bundle.getLocale().getLanguage(),
-                is(new Locale("en_us").getLanguage()));
+                is(new Locale("en", "US").getLanguage()));
     }
 
     @Test
@@ -70,6 +73,6 @@ public class LangUtilTest {
         LangUtil.setDefaultLocale();
 
         // test that bundle is now in default locale
-        assertThat(LangUtil.getBundle().getLocale(), is(Locale.getDefault()));
+        assertThat(LangUtil.getBundle().getLocale().getLanguage(), is(Locale.getDefault().getLanguage()));
     }
 }

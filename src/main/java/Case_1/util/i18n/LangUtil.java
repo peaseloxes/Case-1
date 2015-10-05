@@ -84,6 +84,6 @@ public class LangUtil {
      * Reset the bundle.
      */
     private static void resetBundle() {
-        LangUtil.bundle = ResourceBundle.getBundle(BUNDLE, locale);
+        LangUtil.bundle = ResourceBundle.getBundle(BUNDLE, LangUtil.locale);
     }
 }
