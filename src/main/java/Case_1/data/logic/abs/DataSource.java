@@ -14,6 +14,8 @@ import java.util.List;
  */
 public class DataSource<T> {
 
+    // TODO javadoc
+
     @Getter
     private final DataHandler<DataConnection, T> handler;
 
@@ -43,5 +45,9 @@ public class DataSource<T> {
 
     public List<T> findWhereLike(final String[] keys, final Object[] values) {
         return null;
+    }
+
+    public boolean add(T object) {
+        return handler.add(object);
     }
 }

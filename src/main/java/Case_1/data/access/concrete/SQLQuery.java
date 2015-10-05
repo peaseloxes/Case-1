@@ -38,7 +38,9 @@ public class SQLQuery {
         INT(Types.INTEGER),
         STRING(Types.VARCHAR),
         DOUBLE(Types.DOUBLE),
-        DECIMAL(Types.DECIMAL);
+        DECIMAL(Types.DECIMAL),
+        BOOLEAN(Types.BOOLEAN),
+        DATE(Types.DATE);
 
         @Getter(AccessLevel.PRIVATE)
         private Integer type;

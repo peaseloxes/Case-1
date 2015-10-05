@@ -25,7 +25,7 @@ public class CourseRepository extends Repository<Course> {
 
     /**
      * Finds courses with names matching <b>title</b>.
-     * <p/>
+     * <p>
      * Will return an empty list if no matches are found.
      *
      * @param name the title to match on
@@ -36,5 +36,15 @@ public class CourseRepository extends Repository<Course> {
                 new String[]{"name"},
                 new String[]{name}
         );
+    }
+
+    /**
+     * Adds a course to the datasource of this repository.
+     *
+     * @param course the course to add
+     * @return true if successful
+     */
+    public boolean addCourse(final Course course) {
+        return getDataSource().add(course);
     }
 }

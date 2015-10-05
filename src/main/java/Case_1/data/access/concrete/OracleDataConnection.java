@@ -37,14 +37,19 @@ public class OracleDataConnection implements
         try {
             oracleDataSource = new OracleDataSource();
             oracleDataSource.setURL(Property.DB_URL.toString());
-            connection = oracleDataSource.getConnection(
-                    Property.DB_USERNAME.toString(),
-                    Property.DB_USERNAME.toString()
-            );
+            oracleDataSource.setUser(Property.DB_USERNAME.toString());
+            oracleDataSource.setPassword(Property.DB_PASSWORD.toString());
+            connection = oracleDataSource.getConnection();
         } catch (SQLException e) {
             String message = LangUtil
                     .labelFor("error.dataConnection.connectionFailure")
-                    + Property.DB_URL;
+                    + Property.DB_URL
+                    + " "
+                    + Property.DB_USERNAME.toString()
+                    + "/"
+                    // print password to console
+                    // ... you heard me
+                    + Property.DB_PASSWORD.toString();
 
             LOGGER.error(message);
             e.printStackTrace();

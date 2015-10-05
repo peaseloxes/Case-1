@@ -6,6 +6,7 @@ import Case_1.data.access.concrete.DataResult;
 import Case_1.data.access.concrete.SQLQuery;
 import Case_1.data.object.abs.DataHandler;
 import Case_1.domain.concrete.Course;
+import Case_1.domain.concrete.CourseInstance;
 
 /**
  * Generated.
@@ -40,13 +41,13 @@ public class CourseDataHandler implements
             DataResult result = connection.execute(query);
 
             if (!result.isEmpty()) {
-                // TODO use builder
+                // TODO use builder and make sure validity is ok, also course instances
                 course = new Course(
-                        (Integer)result.getRow(0).get("id"),
-                        (String)result.getRow(0).get("name"),
-                        (String)result.getRow(0).get("code"),
-                        (Integer)result.getRow(0).get("duration"),
-                        (Integer)result.getRow(0).get("applicants"),
+                        (Integer) result.getRow(0).get("id"),
+                        (String) result.getRow(0).get("name"),
+                        (String) result.getRow(0).get("code"),
+                        (Integer) result.getRow(0).get("duration"),
+                        (Integer) result.getRow(0).get("applicants"),
                         null);
             }
             connection.close();
@@ -60,5 +61,44 @@ public class CourseDataHandler implements
             // exception is encountered
         }
         return course;
+    }
+
+    @Override
+    public boolean add(final Course course) {
+        boolean response = false;
+        try {
+            connection.open();
+
+            // first course
+            String sql = "INSERT INTO `COURSE` (ID,COURSECODE,TITLE,DURATIONDAYS,MAXAPPLICANTS) " +
+                    "values (?,?,?,?,?)";
+            SQLQuery query = new SQLQuery();
+            query.setSql(sql);
+            query.addParam(course.getId(), SQLQuery.Type.INT);
+            query.addParam(course.getCode(), SQLQuery.Type.STRING);
+            query.addParam(course.getTitle(), SQLQuery.Type.STRING);
+            query.addParam(course.getDurationDays(), SQLQuery.Type.INT);
+            query.addParam(course.getMaxApplicants(), SQLQuery.Type.INT);
+            response = connection.executeUpdate(query);
+
+            // then course instances
+            for (CourseInstance courseInstance : course.getInstances()) {
+                sql = "INSERT INTO `COURSEINSTANCE` (ID,COURSEID,STARTDATE,ENDDATE,DEFINITIVE,BASEPRICE) " +
+                        "values (?,?,?,?,?,?)";
+                query = new SQLQuery();
+                query.setSql(sql);
+                query.addParam(courseInstance.getId(), SQLQuery.Type.INT);
+                query.addParam(course.getId(), SQLQuery.Type.INT);
+                query.addParam(courseInstance.getStartDate(), SQLQuery.Type.DATE);
+                query.addParam(courseInstance.getEndDate(), SQLQuery.Type.DATE);
+                query.addParam(courseInstance.isDefinitive(), SQLQuery.Type.BOOLEAN);
+                query.addParam(courseInstance.getBasePrice(), SQLQuery.Type.DECIMAL);
+                connection.executeUpdate(query);
+            }
+            connection.close();
+        } catch (DataConnectionException | NullPointerException e) {
+            e.printStackTrace(); // TODO proper exception handling
+        }
+        return response;
     }
 }

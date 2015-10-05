@@ -23,4 +23,11 @@ public interface DataHandler<C, T> {
      */
     T getById(final int id);
 
+
+    /**
+     * Adds an item.
+     * @param item the item to add
+     * @return true if successful
+     */
+    boolean add (T item);
 }

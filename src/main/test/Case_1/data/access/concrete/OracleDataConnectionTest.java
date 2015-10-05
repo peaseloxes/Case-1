@@ -58,29 +58,45 @@ public class OracleDataConnectionTest {
         }
 
         mockResultSetMetaData = mock(ResultSetMetaData.class);
-        when(mockResultSetMetaData.getColumnCount()).thenReturn(2);
-        when(mockResultSetMetaData.getColumnLabel(1)).thenReturn("id");
-        when(mockResultSetMetaData.getColumnLabel(2)).thenReturn("name");
+        when(mockResultSetMetaData.getColumnCount())
+                .thenReturn(2);
+        when(mockResultSetMetaData.getColumnLabel(1))
+                .thenReturn("id");
+        when(mockResultSetMetaData.getColumnLabel(2))
+                .thenReturn("name");
 
         mockEmptyResultSetMetaData = mock(ResultSetMetaData.class);
-        when(mockEmptyResultSetMetaData.getColumnCount()).thenReturn(0);
+        when(mockEmptyResultSetMetaData.getColumnCount())
+                .thenReturn(0);
 
         mockResultSet = mock(ResultSet.class);
-        Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getObject("id")).thenReturn(1);
-        when(mockResultSet.getObject("name")).thenReturn("Course_1");
-        when(mockResultSet.getMetaData()).thenReturn(mockResultSetMetaData);
+        Mockito.when(mockResultSet.next())
+                .thenReturn(true).thenReturn(false);
+        when(mockResultSet.getObject("id"))
+                .thenReturn(1);
+        when(mockResultSet.getObject("name"))
+                .thenReturn("Course_1");
+        when(mockResultSet.getMetaData())
+                .thenReturn(mockResultSetMetaData);
 
         mockEmptyResultSet = mock(ResultSet.class);
-        when(mockEmptyResultSet.next()).thenReturn(false);
-        when(mockEmptyResultSet.getMetaData()).thenReturn(mockEmptyResultSetMetaData);
+        when(mockEmptyResultSet.next())
+                .thenReturn(false);
+        when(mockEmptyResultSet.getMetaData())
+                .thenReturn(mockEmptyResultSetMetaData);
 
         mockPreparedStatement = mock(PreparedStatement.class);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet).thenReturn(mockEmptyResultSet).thenThrow(SQLException.class);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0).thenThrow(SQLException.class);
+        when(mockPreparedStatement.executeQuery())
+                .thenReturn(mockResultSet)
+                .thenReturn(mockEmptyResultSet)
+                .thenThrow(SQLException.class);
+        when(mockPreparedStatement.executeUpdate())
+                .thenReturn(0)
+                .thenThrow(SQLException.class);
 
         mockConnection = mock(Connection.class);
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(anyString()))
+                .thenReturn(mockPreparedStatement);
         doNothing().doThrow(SQLException.class).when(mockConnection).close();
 
         oracleDataConnection = new OracleDataConnection();
@@ -90,11 +106,17 @@ public class OracleDataConnectionTest {
 
     @Test
     public void testOpen() throws Exception {
-        // can only fail without database
-        thrown.expect(DataConnectionException.class);
+        // can only fail without a correct database connection
 
+        try {
+            PrefUtil.setPropertiesFileName("testconfig.properties");
+        } catch (IOException | PrefUtil.PropertyNotFoundException e) {
+            // do nothing, but this should reload preferences so we
+            // can fake a missing database
+        }
+
+        thrown.expect(DataConnectionException.class);
         oracleDataConnection.open();
-        // TODO what if database does exist? will this then fail? find out..
     }
 
     @Test
@@ -117,10 +139,10 @@ public class OracleDataConnectionTest {
         // first time should get a result with two variables
         DataResult result = oracleDataConnection.execute(query);
 
-        if(!result.isEmpty()) {
+        if (!result.isEmpty()) {
             assertThat(result.getRow(0).get("id"), instanceOf(Integer.class));
             assertThat(result.getRow(0).get("name"), instanceOf(String.class));
-        }else{
+        } else {
             fail("result was empty when it shouldn't have been");
         }
 
