@@ -46,6 +46,8 @@ public class LangUtilTest {
     @Test
     public void testGetBundle() throws Exception {
 
+        LangUtil.setLocale("en");
+
         // get the bundle
         ResourceBundle bundle = LangUtil.getBundle();
 
@@ -54,11 +56,13 @@ public class LangUtilTest {
 
         // bundle is in language specified by testconfig.properties
         assertThat(bundle.getLocale().getLanguage(),
-                is(new Locale("en", "US").getLanguage()));
+                is(new Locale("en").getLanguage()));
     }
 
     @Test
     public void testLabelFor() throws Exception {
+
+        LangUtil.setLocale("en");
 
         // test existing label
         assertThat(LangUtil.labelFor("name"), is("Course Planner"));

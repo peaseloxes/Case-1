@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -77,8 +78,10 @@ public class OracleDataConnection implements
                     query.getSql()
             );
             int count = 1;
-            for (Object value : query.getParams().keySet()) {
-                statement.setObject(count, value, query.getParams().get(value));
+            Iterator<SQLQuery.Param> it = query.getIterator();
+            while (it.hasNext()) {
+                SQLQuery.Param param = it.next();
+                statement.setObject(count, param.getObject(), param.getType());
                 count++;
             }
             final ResultSet result = statement.executeQuery();
@@ -117,8 +120,10 @@ public class OracleDataConnection implements
                     query.getSql()
             );
             int count = 1;
-            for (Object value : query.getParams().keySet()) {
-                statement.setObject(count, value, query.getParams().get(value));
+            Iterator<SQLQuery.Param> it = query.getIterator();
+            while (it.hasNext()) {
+                SQLQuery.Param param = it.next();
+                statement.setObject(count, param.getObject(), param.getType());
                 count++;
             }
             statement.executeUpdate();
