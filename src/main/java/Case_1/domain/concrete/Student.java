@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * Created by alex on 10/6/15.
  */
@@ -21,6 +23,7 @@ public class Student extends RestObject implements Validatable {
     private String lastName;
     private String email;
     private Company company;
+    private List<Course> courses;
     // private int privateId;
     // private int discountId;
 

@@ -4,18 +4,18 @@ import Case_1.api.logic.abs.RestController;
 import Case_1.api.util.RestUtil;
 import Case_1.data.access.concrete.OracleDataConnection;
 import Case_1.data.logic.abs.DataSource;
+import Case_1.data.logic.concrete.CourseRepository;
 import Case_1.data.logic.concrete.StudentRepository;
+import Case_1.data.object.concrete.CourseDataHandler;
 import Case_1.data.object.concrete.StudentDataHandler;
+import Case_1.domain.concrete.Course;
 import Case_1.domain.concrete.Student;
 import Case_1.logic.concrete.StudentBuilder;
 import Case_1.util.i18n.LangUtil;
 import lombok.NoArgsConstructor;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -38,6 +38,7 @@ public class StudentController extends RestController<StudentRepository> {
 
     // for the general controller
     private static final String BY_ID = "/students/";
+    private static final String BY_WEEK = "/students/{year}/{week}";
     private static final String CREATE = "/create";
     private static final String NAME = "Students";
 
@@ -77,6 +78,18 @@ public class StudentController extends RestController<StudentRepository> {
         return RestUtil.buildMessageResponse(LangUtil.labelFor("success.user.created"));
     }
 
+    @GET
+    @Path(StudentController.BY_WEEK)
+    public Response getByWeek(
+            @PathParam("year") final int year,
+            @PathParam("week") final int week
+
+    ) {
+        getRepository().getStudentCoursesByYearWeek(year, week);
+        return null;
+
+    }
+
     @Override
     protected StudentRepository getRepository() {
         if (repository == null) {
@@ -89,6 +102,16 @@ public class StudentController extends RestController<StudentRepository> {
             );
         }
         return repository;
+    }
+
+    private CourseRepository getCourseRepository(){
+        return new CourseRepository(
+                new DataSource<Course>(
+                        new CourseDataHandler(
+                                new OracleDataConnection()
+                        )
+                )
+        );
     }
 
     @Override

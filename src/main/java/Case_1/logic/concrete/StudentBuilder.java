@@ -1,7 +1,9 @@
 package Case_1.logic.concrete;
 
+import Case_1.api.logic.concrete.StudentController;
 import Case_1.domain.concrete.Address;
 import Case_1.domain.concrete.Company;
+import Case_1.domain.concrete.Course;
 import Case_1.domain.concrete.Student;
 import Case_1.logic.abs.Builder;
 
@@ -27,6 +29,7 @@ public class StudentBuilder implements Builder {
     @Override
     public StudentBuilder id(final int id) {
         student.setId(id);
+        student.setSelf(StudentController.ROOT + "/" + id);
         return this;
     }
 
@@ -42,6 +45,11 @@ public class StudentBuilder implements Builder {
 
     public StudentBuilder email(final String email) {
         student.setEmail(email);
+        return this;
+    }
+
+    public StudentBuilder addCourse(final Course course) {
+        student.getCourses().add(course);
         return this;
     }
 

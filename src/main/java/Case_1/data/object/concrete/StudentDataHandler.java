@@ -8,10 +8,14 @@ import Case_1.data.object.abs.DataHandler;
 import Case_1.domain.concrete.Address;
 import Case_1.domain.concrete.Company;
 import Case_1.domain.concrete.Student;
+import Case_1.logic.concrete.StudentBuilder;
 import Case_1.util.i18n.LangUtil;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by alex on 10/6/15.
@@ -169,7 +173,70 @@ public class StudentDataHandler implements
 
     @Override
     public List<Student> getAll() {
-        return null;
+        List<Student> students = new ArrayList<>();
+        try {
+            connection.open();
+            String sql = "SELECT * FROM STUDENT ORDER BY ID";
+            SQLQuery query = new SQLQuery();
+            query.setSql(sql);
+            DataResult studentResult = connection.execute(query);
+
+
+            Iterator<Map<String, Object>> it = studentResult.getIterator();
+            while (it.hasNext()) {
+                Map map = it.next();
+
+                StudentBuilder builder = StudentBuilder.getInstance();
+                builder .id(((BigDecimal) map.get("ID")).intValue())
+                        .firstName((String) map.get("FIRSTNAME"))
+                        .lastName((String)map.get("LASTNAME"))
+                        .email((String)map.get("EMAIL"));
+
+
+                sql = "SELECT * FROM COMPANY WHERE ID = ?";
+                query = new SQLQuery();
+                query.addParam(((BigDecimal) map.get("COMPANYID")).intValue(), SQLQuery.Type.INT);
+                query.setSql(sql);
+                DataResult companyResult = connection.execute(query);
+
+                if(companyResult.isEmpty()){
+                    throw new DataConnectionException("company not found");
+                }
+
+                sql = "SELECT * FROM ADDRESS WHERE ID = ?";
+                query = new SQLQuery();
+                query.addParam(((BigDecimal) companyResult.getRow(0).get("ADDRESSID")).intValue(), SQLQuery.Type.INT);
+                query.setSql(sql);
+                DataResult addressResult = connection.execute(query);
+
+
+                if(addressResult.isEmpty()){
+                    throw new DataConnectionException("company not found");
+                }
+
+                Map<String, Object> companyMap = companyResult.getRow(0);
+                Map<String, Object> addressMap = addressResult.getRow(0);
+
+                builder.addressCompany(
+                        ((BigDecimal) companyMap.get("ID")).intValue(),
+                        (String) companyMap.get("NAME"),
+                        (String) companyMap.get("BIDNUMER"),
+                        (String) companyMap.get("ACCOUNTNUMBER"),
+                        (String) companyMap.get("PHONENUMBER"),
+                        (String) companyMap.get("DEPARTMENT"),
+                        ((BigDecimal) addressMap.get("ID")).intValue(),
+                        (String) addressMap.get("STREETNUMBER"),
+                        (String) addressMap.get("STREETNAME"),
+                        (String) addressMap.get("POSTALCODE"),
+                        (String) addressMap.get("CITY")
+                );
+                students.add(builder.create());
+            }
+
+        } catch (DataConnectionException e) {
+            e.printStackTrace();
+        }
+        return students;
     }
 
     @Override
@@ -190,6 +257,23 @@ public class StudentDataHandler implements
         connection.executeUpdate(query);
         connection.close();
         return true;
+    }
+
+    @Override
+    public List<Student> getStudentCoursesByYearWeek(final int year,final int week) throws DataConnectionException{
+        List<Student> students = new ArrayList<>();
+
+        //select * from work_table where created_date beween to_date('9/18/2007','MM/DD/YYYY') and to_date('03/29/2008','MM/DD/YYYY')
+        connection.open();
+
+        // get all courses+instances in this week
+
+        String sql = "SELECT * FROM STUDENT ORDER BY ID";
+        SQLQuery query = new SQLQuery();
+        query.setSql(sql);
+        DataResult studentResult = connection.execute(query);
+
+        return students;
     }
 
     private int getStudentId(final Student student) throws DataConnectionException {

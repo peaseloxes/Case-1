@@ -5,6 +5,8 @@ import Case_1.data.logic.abs.DataSource;
 import Case_1.data.logic.abs.Repository;
 import Case_1.domain.concrete.Student;
 
+import java.util.List;
+
 /**
  * Created by alex on 10/6/15.
  */
@@ -20,5 +22,9 @@ public class StudentRepository extends Repository<Student> {
 
     public boolean subscribeTo(final Student student, final int instanceId) throws DataConnectionException {
         return getDataSource().subscribeTo(student, instanceId);
+    }
+
+    public List<Student> getStudentCoursesByYearWeek(final int year, final int week) throws DataConnectionException {
+        return getDataSource().getStudentCoursesByYearWeek(year,week);
     }
 }
