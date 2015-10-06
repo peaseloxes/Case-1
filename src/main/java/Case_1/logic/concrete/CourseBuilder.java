@@ -1,5 +1,6 @@
 package Case_1.logic.concrete;
 
+import Case_1.api.logic.concrete.CourseController;
 import Case_1.domain.concrete.Course;
 import Case_1.domain.concrete.CourseInstance;
 import Case_1.logic.abs.Builder;
@@ -37,6 +38,7 @@ public class CourseBuilder implements Builder<CourseBuilder, Course> {
     @Override
     public CourseBuilder id(final int id) {
         course.setId(id);
+        course.setSelf(CourseController.ROOT + "/" + id);
         return this;
     }
 

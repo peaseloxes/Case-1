@@ -33,15 +33,15 @@ import java.util.List;
 public class CourseController extends RestController<CourseRepository> {
     private CourseRepository repository;
 
-    public CourseController(final CourseRepository repository){
+    public CourseController(final CourseRepository repository) {
         this.repository = repository;
     }
 
     // for use in @Path
-    protected static final String ROOT = "/courses";
+    public static final String ROOT = "/courses";
 
     // for the general controller
-    private static final String BY_ID = "/courses/{id}";
+    private static final String BY_ID = "/courses/";
     private static final String CREATE = "/create";
     private static final String NAME = "Courses";
 
@@ -49,27 +49,33 @@ public class CourseController extends RestController<CourseRepository> {
     @Path(CREATE)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response importFile(@FormDataParam("file") final InputStream stream) {
-        InputStreamDataConnection connection = new InputStreamDataConnection();
+
         try {
+            if (stream == null) {
+                throw new IllegalArgumentException(LangUtil.labelFor("error.courses.notCreated") + " no file present");
+            }
+
+            InputStreamDataConnection connection = new InputStreamDataConnection();
+
             connection.setConnection(stream);
             connection.open();
             DataResult result = connection.execute("");
+            connection.close();
             CourseParser parser = new CourseParser();
             List<Course> list = parser.parse(result.valuesToList(0));
             getRepository().addAll(list);
-            connection.close();
-        } catch (DataConnectionException e) {
-            // TODO bad request, no cookie
-            e.printStackTrace();
-        } catch (CourseParser.CourseParsingException e) {
-            e.printStackTrace();
+
+        } catch (DataConnectionException
+                | CourseParser.CourseParsingException
+                | IllegalArgumentException e) {
+            return RestUtil.buildMessageResponse(LangUtil.labelFor("error.courses.notCreated") + " " + e.getMessage());
         }
         return RestUtil.buildMessageResponse(LangUtil.labelFor("success.courses.created"));
     }
 
     @Override
     protected CourseRepository getRepository() {
-        if(repository==null) {
+        if (repository == null) {
             repository = new CourseRepository(
                     new DataSource<Course>(
                             new CourseDataHandler(

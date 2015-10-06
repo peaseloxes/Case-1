@@ -40,11 +40,11 @@ public class Pagination<T> {
 
         // override in case of 0 values
         if (start == 0) {
-            setPrev("");
+            setPrev(url);
         }
 
         if (limit == 0) {
-            setNext("");
+            setNext(url);
         }
     }
 }

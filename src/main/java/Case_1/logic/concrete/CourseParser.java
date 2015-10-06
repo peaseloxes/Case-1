@@ -2,6 +2,7 @@ package Case_1.logic.concrete;
 
 import Case_1.domain.concrete.Course;
 import Case_1.logic.abs.IncorrectVariablesException;
+import Case_1.util.i18n.LangUtil;
 import Case_1.util.pref.PrefUtil;
 import lombok.AllArgsConstructor;
 
@@ -39,9 +40,7 @@ public class CourseParser {
         try {
             loadParsingPreferences();
         } catch (PrefUtil.PropertyNotFoundException e) {
-            // TODO use case validate and explain
-            throw new CourseParsingException("help me, I'm trapped in an " +
-                    "Exception factory");
+            throw new CourseParsingException(LangUtil.labelFor("error.properties.notFound"));
         }
 
         // reset the list
@@ -53,44 +52,44 @@ public class CourseParser {
         while (i < lines.size()) {
 
             if (lines.get(i).equals("")) {
-                // TODO use case validate
-                throw new CourseParsingException("unexpected new line");
+                throw new CourseParsingException(LangUtil.labelFor("error.unexpectedNewLine"));
             }
-
-            // line 1 of 5 > title
-            final String title = extractTitle(lines.get(i));
-
-            // line 2 of 5 > code
-            i++;
-            final String code = extractCode(lines.get(i));
-
-            // line 3 of 5 > duration
-            i++;
-            final int duration = extractDuration(lines.get(i));
-
-            // line 4 of 5 > starting date
-            i++;
-            final LocalDateTime startDate = extractStartDate(lines.get(i));
-
-            // line 5 of 5 > save
             try {
-                CourseBuilder builder = CourseBuilder.getInstance();
-                // TODO ensure uniquenessnessness
+                // line 1 of 5 > title
+                final String title = extractTitle(lines.get(i));
 
-                builder.id(i)
-                        .title(title)
-                        .maxApplicants(5)
-                        .code(code)
-                        .duration(duration)
-                        .instance(i, startDate, startDate.plusDays(duration - 1), 0D)
-                        .create();
+                // line 2 of 5 > code
+                i++;
+                final String code = extractCode(lines.get(i));
 
-                courseList.add(builder.create());
-            } catch (IncorrectVariablesException e) {
+                // line 3 of 5 > duration
+                i++;
+                final int duration = extractDuration(lines.get(i));
 
-                // TODO use case validate and explain
-                // for now just throw a hissyfit
-                throw new CourseParsingException("ruh roh");
+                // line 4 of 5 > starting date
+                i++;
+                final LocalDateTime startDate = extractStartDate(lines.get(i));
+
+                // line 5 of 5 > save
+                try {
+                    CourseBuilder builder = CourseBuilder.getInstance();
+                    // uniqueness is covered by CourseDataHandler
+                    builder.id(i)
+                            .title(title)
+                            .maxApplicants(5)
+                            .code(code)
+                            .duration(duration)
+                            .instance(i, startDate, startDate.plusDays(duration - 1), 0D)
+                            .create();
+
+                    courseList.add(builder.create());
+                } catch (IncorrectVariablesException e) {
+
+                    // for now just throw a hissyfit
+                    throw new CourseParsingException(LangUtil.labelFor("error.courses.validationFailed"));
+                }
+            } catch (CourseParsingException e) {
+                throw new CourseParsingException(e.getMessage() + " " + LangUtil.labelFor("error.line") + " " + i);
             }
 
             // at the end in case the section does not end with a newline
@@ -202,8 +201,7 @@ public class CourseParser {
         try {
             duration = Integer.valueOf(cleanDuration);
         } catch (NumberFormatException e) {
-            // TODO use case validation etc.
-            throw new CourseParsingException("duration not a number");
+            throw new CourseParsingException(LangUtil.labelFor("error.courses.numberExpected"));
         }
         return duration;
     }
@@ -233,18 +231,17 @@ public class CourseParser {
                 placeholders,
                 new String[]{"", ""});
 
-        try {
-            String[] sploded = cleanDate.split("/");
+        String[] sploded;
 
-            try {
-                assert (sploded.length == 3);
-            } catch (AssertionError e) {
-                throw new CourseParsingException("date wrong");
-            }
+        try {
+            sploded = cleanDate.split("/");
+            assert (sploded.length == 3);
+
 
             int day = Integer.valueOf(sploded[0]);
             int month = Integer.valueOf(sploded[1]);
             int year = Integer.valueOf(sploded[2]);
+
 
             LocalDateTime duration = LocalDateTime.of(
                     year,
@@ -254,9 +251,11 @@ public class CourseParser {
                     0
             );
             return duration;
-        } catch (Exception e) {
-            throw new CourseParsingException("date wrong");
+        } catch (AssertionError | NumberFormatException e) {
+            throw new CourseParsingException(LangUtil.labelFor("error.courses.unexpectedDateFormat") + " " + cleanDate);
         }
+
+
     }
 
     /**
@@ -274,7 +273,7 @@ public class CourseParser {
             throws IllegalArgumentException {
 
         if (occurrences.length != replacements.length) {
-            throw new IllegalArgumentException("You shall not pass!");
+            throw new IllegalArgumentException("You shall not pass!"); // not for user
         }
 
         String newLine = line;
@@ -304,12 +303,13 @@ public class CourseParser {
             // if thingy not present
             if (!toValidate.contains(placeHolders[i])) {
 
-                // TODO use case yada yada
                 // keep calm and panic
-                throw new CourseParsingException("Illegal "
+                throw new CourseParsingException(LangUtil.labelFor("error.courses.illegal")
+                        + " "
                         + lineName
-                        + " line, contains no "
-                        + placeHolders[i]);
+                        //+ " "
+                        //+ LangUtil.labelFor("error.courses.line")
+                );
             }
         }
     }
@@ -332,5 +332,10 @@ public class CourseParser {
     @AllArgsConstructor
     public class CourseParsingException extends Exception {
         private String message;
+
+        @Override
+        public String getMessage() {
+            return message;
+        }
     }
 }

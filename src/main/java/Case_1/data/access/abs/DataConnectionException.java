@@ -1,6 +1,7 @@
 package Case_1.data.access.abs;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Generated.
@@ -10,5 +11,6 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public class DataConnectionException extends Exception {
+    @Getter
     private String message;
 }

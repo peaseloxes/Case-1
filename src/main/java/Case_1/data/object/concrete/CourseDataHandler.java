@@ -8,6 +8,7 @@ import Case_1.data.object.abs.DataHandler;
 import Case_1.domain.concrete.Course;
 import Case_1.domain.concrete.CourseInstance;
 import Case_1.logic.concrete.CourseBuilder;
+import Case_1.util.i18n.LangUtil;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -73,25 +74,21 @@ public class CourseDataHandler implements
     }
 
     @Override
-    public boolean add(final Course course) {
+    public boolean add(final Course course) throws DataConnectionException {
         boolean response = false;
 
         try {
             if (!courseExists(course.getCode())) {
                 addCourse(course);
             }
-
             int courseid = getCourseIdByCode(course.getCode());
-
             for (CourseInstance courseInstance : course.getInstances()) {
                 if (!courseInstanceExistsFor(courseid, courseInstance.getStartDate())) {
                     addCourseInstanceFor(courseInstance, courseid);
                 }
             }
-
-
-        } catch (DataConnectionException | NullPointerException e) {
-            e.printStackTrace(); // TODO proper exception handling
+        } catch (NullPointerException e) {
+            throw new DataConnectionException(LangUtil.labelFor("error.course.addition"));
         }
         return response;
     }
@@ -290,7 +287,7 @@ public class CourseDataHandler implements
 
         connection.close();
         if (result.isEmpty()) {
-            throw new DataConnectionException("");
+            throw new DataConnectionException("No course found");
         } else {
             return ((BigDecimal) result.getRow(0).get("ID")).intValue();
         }

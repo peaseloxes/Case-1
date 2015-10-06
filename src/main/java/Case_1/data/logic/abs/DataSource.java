@@ -1,6 +1,7 @@
 package Case_1.data.logic.abs;
 
 import Case_1.data.access.abs.DataConnection;
+import Case_1.data.access.abs.DataConnectionException;
 import Case_1.data.object.abs.DataHandler;
 import lombok.Getter;
 
@@ -57,7 +58,7 @@ public class DataSource<T> {
         return null;
     }
 
-    public boolean add(final T object) {
+    public boolean add(final T object) throws DataConnectionException {
         return handler.add(object);
     }
 }

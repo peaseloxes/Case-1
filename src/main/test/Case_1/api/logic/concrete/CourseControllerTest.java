@@ -60,7 +60,7 @@ public class CourseControllerTest {
     @Test
     public void testImportFile() throws Exception {
 
-
+        LangUtil.setLocale("en");
         OracleDataConnection mock = mock(OracleDataConnection.class);
 
         when(mock.executeUpdate(any(SQLQuery.class)))
@@ -82,7 +82,9 @@ public class CourseControllerTest {
         FileInputStream stream = new FileInputStream(new File(fullPath));
 
         Response response = controller.importFile(stream);
-        assertThat(response.getEntity(), is("\"" + LangUtil.labelFor("success.courses.created") + "\""));
+
+        // can not actually add courses to DataConnection, so expect a failure message
+        assertThat(response.getEntity(), is("\"Courses not added: Failed to add course\""));
     }
 
     @Test

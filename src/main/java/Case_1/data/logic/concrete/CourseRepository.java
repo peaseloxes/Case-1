@@ -1,5 +1,6 @@
 package Case_1.data.logic.concrete;
 
+import Case_1.data.access.abs.DataConnectionException;
 import Case_1.data.logic.abs.DataSource;
 import Case_1.data.logic.abs.Repository;
 import Case_1.domain.concrete.Course;
@@ -79,11 +80,11 @@ public class CourseRepository extends Repository<Course> {
      * @param course the course to add
      * @return true if successful
      */
-    public boolean addCourse(final Course course) {
+    public boolean addCourse(final Course course) throws DataConnectionException {
         return getDataSource().add(course);
     }
 
-    public boolean addAll(final List<Course> list) {
+    public boolean addAll(final List<Course> list) throws DataConnectionException {
         for (Course course : list) {
             addCourse(course);
         }

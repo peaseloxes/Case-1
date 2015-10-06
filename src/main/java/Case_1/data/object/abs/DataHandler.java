@@ -1,5 +1,7 @@
 package Case_1.data.object.abs;
 
+import Case_1.data.access.abs.DataConnectionException;
+
 import java.util.List;
 
 /**
@@ -32,7 +34,7 @@ public interface DataHandler<C, T> {
      * @param item the item to add
      * @return true if successful
      */
-    boolean add(T item);
+    boolean add(T item) throws DataConnectionException;
 
     /**
      * Finds an item by column / value pair.

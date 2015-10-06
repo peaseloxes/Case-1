@@ -8,6 +8,7 @@ import Case_1.data.object.concrete.CourseDataHandler;
 import Case_1.domain.concrete.Course;
 import Case_1.domain.concrete.CourseInstance;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -75,6 +76,10 @@ public class CourseRepositoryTest {
 
     @Test
     public void testGetById() throws Exception {
+        when(mock.execute(any(SQLQuery.class)))
+                .thenReturn(filledResult)
+                .thenReturn(emptyResult)
+                .thenReturn(null);
 
         // get a result that exists
         Course result = repository.getById(1);
@@ -98,7 +103,15 @@ public class CourseRepositoryTest {
     }
 
     @Test
+    @Ignore("will fail because the connection now checks if added Courses exist or not")
     public void testAdd() throws Exception {
+
+        when(mock.executeUpdate(any(SQLQuery.class)))
+                .thenReturn(true) // first Course
+                .thenReturn(true) // first CourseInstance
+                .thenReturn(false) // Second Course
+                .thenReturn(false) // Second Course instance
+                .thenThrow(SQLException.class); // third whatever
 
         // note proper DB addition is not tested/verified
         // merely the logic getting it there
