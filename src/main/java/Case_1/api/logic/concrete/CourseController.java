@@ -12,6 +12,7 @@ import Case_1.data.object.concrete.CourseDataHandler;
 import Case_1.domain.concrete.Course;
 import Case_1.logic.concrete.CourseParser;
 import Case_1.util.i18n.LangUtil;
+import lombok.NoArgsConstructor;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.ws.rs.Consumes;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 @Path(CourseController.ROOT)
 @Produces("application/json")
+@NoArgsConstructor
 public class CourseController extends RestController<CourseRepository> {
     private CourseRepository repository;
 

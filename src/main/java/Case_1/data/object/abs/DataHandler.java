@@ -1,5 +1,7 @@
 package Case_1.data.object.abs;
 
+import java.util.List;
+
 /**
  * Generated.
  *
@@ -32,4 +34,12 @@ public interface DataHandler<C, T> {
      */
     boolean add(T item);
 
+    /**
+     * Finds an item by column / value pair.
+     *
+     * @param key column name
+     * @param value required value
+     * @return the item(s)
+     */
+    List<T> getByKey(String key, Object value);
 }

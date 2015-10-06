@@ -39,6 +39,19 @@ public class CourseRepository extends Repository<Course> {
     }
 
     /**
+     * Finds a course given a course code.
+     *
+     * @param code the code
+     * @return a course or null
+     */
+    public Course getByCourseCode(final String code) {
+        return getDataSource().findWhere(
+                new String[]{"name"},
+                new String[]{code}
+        ).get(0);
+    }
+
+    /**
      * Get all courses.
      *
      * @return all known courses
@@ -60,7 +73,6 @@ public class CourseRepository extends Repository<Course> {
     }
 
 
-
     /**
      * Adds a course to the datasource of this repository.
      *
@@ -72,7 +84,7 @@ public class CourseRepository extends Repository<Course> {
     }
 
     public boolean addAll(final List<Course> list) {
-        for(Course course : list) {
+        for (Course course : list) {
             addCourse(course);
         }
         return true;

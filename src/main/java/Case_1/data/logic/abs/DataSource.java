@@ -4,6 +4,7 @@ import Case_1.data.access.abs.DataConnection;
 import Case_1.data.object.abs.DataHandler;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,7 +41,16 @@ public class DataSource<T> {
     }
 
     public List<T> findWhere(final String[] keys, final Object[] values) {
-        return null;
+        List<T> results = new ArrayList<>();
+        if(keys.length != values.length) {
+            throw new IllegalArgumentException("keys and values are of different length");
+        }
+
+        for (int i = 0; i < keys.length; i++) {
+            results.addAll(handler.getByKey(keys[i], values[i]));
+        }
+
+        return results;
     }
 
     public List<T> findWhereLike(final String[] keys, final Object[] values) {

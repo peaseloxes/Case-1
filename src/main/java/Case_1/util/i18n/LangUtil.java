@@ -21,7 +21,7 @@ public class LangUtil {
      * The default locale in case the preferred one can not be read from
      * config.properties.
      */
-    private static Locale locale = Locale.getDefault();
+    private static Locale locale;
 
     /**
      * Change the locale using a locale string.
