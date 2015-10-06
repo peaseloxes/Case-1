@@ -242,6 +242,11 @@ public class CourseDataHandler implements
         return null;
     }
 
+    @Override
+    public boolean subscribeTo(Course subscriber, int subscribableId) {
+        throw new UnsupportedOperationException("wut?");
+    }
+
 
     private boolean courseExists(final String code) throws DataConnectionException {
         connection.open();

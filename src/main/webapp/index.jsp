@@ -15,6 +15,7 @@
 
 <form enctype="multipart/form-data" method="post" action="api/students/create">
     <%--
+    @FormDataParam("courseInstanceId") final String courseInstanceId,
     @FormDataParam("firstName") final String firstName,
             @FormDataParam("lastName") final String lastName,
             @FormDataParam("email") final String email,
@@ -29,6 +30,7 @@
             @FormDataParam("city") final String city
 
     --%>
+        <label for="courseInstanceId">courseInstanceId</label> <input type="text" id="courseInstanceId" name="courseInstanceId"><br/>
     <label for="firstName">first name</label> <input type="text" id="firstName" name="firstName"><br/>
         <label for="lastName">last name</label> <input type="text" id="lastName" name="lastName"><br/>
         <%--<label for="email">email</label> <input type="text" id="email" name="email"><br/>--%>

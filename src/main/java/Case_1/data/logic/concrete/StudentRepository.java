@@ -17,4 +17,8 @@ public class StudentRepository extends Repository<Student> {
     public boolean add(final Student student) throws DataConnectionException {
         return getDataSource().add(student);
     }
+
+    public boolean subscribeTo(final Student student, final int instanceId) throws DataConnectionException {
+        return getDataSource().subscribeTo(student, instanceId);
+    }
 }

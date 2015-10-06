@@ -45,6 +45,7 @@ public class StudentController extends RestController<StudentRepository> {
     @Path(CREATE)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response createStudent(
+            @FormDataParam("courseInstanceId") final String courseInstanceId,
             @FormDataParam("firstName") final String firstName,
             @FormDataParam("lastName") final String lastName,
 //            @FormDataParam("email") final String email,
@@ -66,6 +67,8 @@ public class StudentController extends RestController<StudentRepository> {
                 .create();
         try {
             getRepository().add(student);
+            int instanceId = Integer.valueOf(courseInstanceId);
+            getRepository().subscribeTo(student, instanceId);
         } catch (Exception e) {
             e.printStackTrace();
             return RestUtil.buildMessageResponse(LangUtil.labelFor("error.user.notCreated") + " " + e.getMessage());

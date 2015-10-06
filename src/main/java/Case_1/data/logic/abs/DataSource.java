@@ -61,4 +61,8 @@ public class DataSource<T> {
     public boolean add(final T object) throws DataConnectionException {
         return handler.add(object);
     }
+
+    public boolean subscribeTo(T subscriber, int subscribableId) throws DataConnectionException {
+        return handler.subscribeTo(subscriber,subscribableId);
+    }
 }

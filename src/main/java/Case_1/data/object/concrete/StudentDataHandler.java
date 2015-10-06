@@ -176,4 +176,37 @@ public class StudentDataHandler implements
     public List<Student> getAll(int start, int limit) {
         return null;
     }
+
+    @Override
+    public boolean subscribeTo(final Student student, final int courseInstanceId) throws DataConnectionException{
+        int studentId = getStudentId(student);
+        connection.open();
+        String sql = "INSERT INTO STUDENT_COURSEINSTANCE (STUDENTID,COURSEINSTANCEID,APPLICATIONDATE) " +
+                "values (?,?,SYSDATE)";
+        SQLQuery query = new SQLQuery();
+        query.setSql(sql);
+        query.addParam(studentId, SQLQuery.Type.INT);
+        query.addParam(courseInstanceId, SQLQuery.Type.INT);
+        connection.executeUpdate(query);
+        connection.close();
+        return true;
+    }
+
+    private int getStudentId(final Student student) throws DataConnectionException {
+        connection.open();
+        String sql = "SELECT ID FROM STUDENT WHERE FIRSTNAME = ? AND LASTNAME = ?";
+        SQLQuery query = new SQLQuery();
+        query.setSql(sql);
+        query.addParam(student.getFirstName(), SQLQuery.Type.STRING);
+        query.addParam(student.getLastName(), SQLQuery.Type.STRING);
+        DataResult result = connection.execute(query);
+        connection.close();
+
+        if(result.isEmpty()){
+            // TODO langutil
+            throw new DataConnectionException("Can't find student");
+        }else{
+            return ((BigDecimal)result.getRow(0).get("ID")).intValue();
+        }
+    }
 }

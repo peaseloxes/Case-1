@@ -48,4 +48,6 @@ public interface DataHandler<C, T> {
     List<T> getAll();
 
     List<T> getAll(final int start, final int limit);
+
+    boolean subscribeTo(T subscriber, int subscribableId) throws DataConnectionException;
 }
