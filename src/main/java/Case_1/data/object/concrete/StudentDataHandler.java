@@ -35,8 +35,67 @@ public class StudentDataHandler implements
 
 
     @Override
-    public Student getById(int id) {
-        return null;
+    public Student getById(final int id) throws DataConnectionException {
+        Student student = null;
+        connection.open();
+        // get student
+        String sql = "SELECT * FROM STUDENT WHERE ID = ?";
+        SQLQuery query = new SQLQuery();
+        query.setSql(sql);
+        query.addParam(id, SQLQuery.Type.INT);
+
+        DataResult studentResult = connection.execute(query);
+        Map<String, Object> studentMap = studentResult.getRow(0);
+        StudentBuilder studentBuilder = StudentBuilder.getInstance();
+        studentBuilder.id(((BigDecimal) studentMap.get("ID")).intValue())
+                .firstName((String) studentMap.get("FIRSTNAME"))
+                .lastName((String) studentMap.get("LASTNAME"))
+                .email((String) studentMap.get("EMAIL"));
+
+        // get courses
+
+
+        // get course instances ordered by date
+
+        sql = "SELECT * FROM COURSEINSTANCE WHERE ID IN (SELECT COURSEINSTANCEID FROM STUDENT_COURSEINSTANCE WHERE STUDENTID = ? ) ORDER BY STARTDATE ASC";
+        query = new SQLQuery();
+        query.setSql(sql);
+        query.addParam(((BigDecimal) studentMap.get("ID")).intValue(), SQLQuery.Type.INT);
+        DataResult courseInstances = connection.execute(query);
+
+        Iterator<Map<String,Object>> instanceIterator = courseInstances.getIterator();
+
+        while(instanceIterator.hasNext()) {
+            Map<String,Object> courseInstance = instanceIterator.next();
+            int courseId = ((BigDecimal) courseInstance.get("COURSEID")).intValue();
+
+            sql = "SELECT * FROM COURSE WHERE ID = ?";
+            query = new SQLQuery();
+            query.setSql(sql);
+            query.addParam(courseId, SQLQuery.Type.INT);
+            DataResult courseResult = connection.execute(query);
+
+            Map<String,Object> courseResultMap = courseResult.getRow(0);
+
+            CourseBuilder courseBuilder = CourseBuilder.getInstance();
+            courseBuilder.id(((BigDecimal) courseResultMap.get("ID")).intValue())
+                    .title((String) courseResultMap.get("TITLE"))
+                    .code((String) courseResultMap.get("COURSECODE"))
+                    .duration(((BigDecimal) courseResultMap.get("DURATIONDAYS")).intValue())
+                    .maxApplicants(((BigDecimal) courseResultMap.get("MAXAPPLICANTS")).intValue());
+
+            courseBuilder.instance(
+                    ((BigDecimal) courseInstance.get("ID")).intValue(),
+                    ((Timestamp) courseInstance.get("STARTDATE")).toLocalDateTime(),
+                    ((Timestamp) courseInstance.get("ENDDATE")).toLocalDateTime(),
+                    ((BigDecimal) courseInstance.get("BASEPRICE")).doubleValue()
+            );
+
+            studentBuilder.addCourse(courseBuilder.create());
+        }
+
+        connection.close();
+        return studentBuilder.create();
     }
 
     //TODO proper company in database, not unique one for every student

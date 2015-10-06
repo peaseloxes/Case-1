@@ -25,7 +25,7 @@ public interface DataHandler<C, T> {
      * @param id the id to search for
      * @return T or null
      */
-    T getById(final int id);
+    T getById(final int id) throws DataConnectionException;
 
 
     /**

@@ -19,6 +19,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 
 /**
  * Created by alex on 10/6/15.
@@ -38,10 +39,27 @@ public class StudentController extends RestController<StudentRepository> {
     public static final String ROOT = "/students";
 
     // for the general controller
-    private static final String BY_ID = "/students/";
+    private static final String BY_ID = "/{id}";
     private static final String BY_WEEK = "/{year}/{week}";
     private static final String CREATE = "/create";
     private static final String NAME = "Students";
+
+    @GET
+    @Path(BY_ID)
+    public Response getById(@PathParam("id") final int id) {
+        try{
+            Pagination<Student> pagination = new Pagination("/",0,0, Arrays.asList(getRepository().getById(id)));
+            // TODO prevent neg infinite etc.
+            pagination.setNext("/"+(id-1));
+            pagination.setPrev("/"+(id+1));
+            return RestUtil.buildResponse(pagination,"Student");
+        } catch (Exception e){
+            // TODO lang
+            e.printStackTrace();
+            return RestUtil.buildMessageResponse(LangUtil.labelFor("sdfsfdsfdsfd") + " " + e.getMessage());
+        }
+
+    }
 
     @POST
     @Path(CREATE)
@@ -91,10 +109,11 @@ public class StudentController extends RestController<StudentRepository> {
 
             // TODO year transfer
             page.setPrev("/"+year+"/"+(week-1));
-            page.setNext("/"+year+"/"+(week+1));
+            page.setNext("/" + year + "/" + (week + 1));
             return RestUtil.buildResponse(page,"Students by week");
         } catch (Exception e) {
             e.printStackTrace();
+            // TODO lang
             return RestUtil.buildMessageResponse(LangUtil.labelFor("sdfsfdsfdsfd") + " " + e.getMessage());
         }
 

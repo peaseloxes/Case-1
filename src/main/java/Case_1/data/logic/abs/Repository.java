@@ -1,5 +1,6 @@
 package Case_1.data.logic.abs;
 
+import Case_1.data.access.abs.DataConnectionException;
 import lombok.AccessLevel;
 import lombok.Getter;
 
@@ -20,7 +21,7 @@ public abstract class Repository<T> {
         this.dataSource = dataSource;
     }
 
-    public T getById(final int id) {
+    public T getById(final int id) throws DataConnectionException {
         return dataSource.findById(id);
     }
 

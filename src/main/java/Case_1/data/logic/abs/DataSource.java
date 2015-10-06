@@ -25,7 +25,7 @@ public class DataSource<T> {
         this.handler = handler;
     }
 
-    public T findById(final int id) {
+    public T findById(final int id) throws DataConnectionException {
         return handler.getById(id);
     }
 
