@@ -3,11 +3,13 @@ package Case_1.logic.concrete;
 import Case_1.api.logic.concrete.CourseController;
 import Case_1.domain.concrete.Course;
 import Case_1.domain.concrete.CourseInstance;
+import Case_1.domain.concrete.Student;
 import Case_1.logic.abs.Builder;
 import Case_1.logic.abs.IncorrectVariablesException;
 import Case_1.util.i18n.LangUtil;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Generated.
@@ -117,7 +119,31 @@ public class CourseBuilder implements Builder<CourseBuilder, Course> {
                         startDate,
                         endData,
                         false,
-                        basePrice));
+                        basePrice, null));
+        return this;
+    }
+
+    /**
+     * Add an instance to this course with a studentlist.
+     *
+     * @param id        the course instance id
+     * @param startDate the starting date
+     * @param endData   the end date
+     * @param basePrice the base price of the instance
+     * @param students  student list
+     * @return this builder instance
+     */
+    public CourseBuilder instance(final int id,
+                                  final LocalDateTime startDate,
+                                  final LocalDateTime endData,
+                                  final Double basePrice,
+                                  final List<Student> students) {
+        course.getInstances().add(
+                new CourseInstance(id,
+                        startDate,
+                        endData,
+                        false,
+                        basePrice, students));
         return this;
     }
 

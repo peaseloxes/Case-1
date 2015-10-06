@@ -90,4 +90,8 @@ public class CourseRepository extends Repository<Course> {
         }
         return true;
     }
+
+    public List<Course> getStudentCoursesByYearWeek(final int year, final int week) throws DataConnectionException {
+        return getDataSource().getStudentCoursesByYearWeek(year,week);
+    }
 }

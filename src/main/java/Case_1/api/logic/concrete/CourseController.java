@@ -1,5 +1,6 @@
 package Case_1.api.logic.concrete;
 
+import Case_1.api.domain.concrete.Pagination;
 import Case_1.api.logic.abs.RestController;
 import Case_1.api.util.RestUtil;
 import Case_1.data.access.abs.DataConnectionException;
@@ -15,10 +16,7 @@ import Case_1.util.i18n.LangUtil;
 import lombok.NoArgsConstructor;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
@@ -42,6 +40,7 @@ public class CourseController extends RestController<CourseRepository> {
 
     // for the general controller
     private static final String BY_ID = "/courses/";
+    private static final String BY_WEEK = "/{year}/{week}";
     private static final String CREATE = "/create";
     private static final String NAME = "Courses";
 
@@ -85,6 +84,28 @@ public class CourseController extends RestController<CourseRepository> {
             );
         }
         return repository;
+    }
+
+    @GET
+    @Path(BY_WEEK)
+    public Response getByWeek(
+            @PathParam("year") final int year,
+            @PathParam("week") final int week
+
+    ) {
+        try {
+            Pagination<Course> page = new Pagination<>(getIdUrl(),0,0,  getRepository().getStudentCoursesByYearWeek(year, week));
+
+            // TODO year transfer
+            page.setPrev("/"+year+"/"+(week-1));
+            page.setNext("/"+year+"/"+(week+1));
+            return RestUtil.buildResponse(page,"Students by week");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return RestUtil.buildMessageResponse(LangUtil.labelFor("sdfsfdsfdsfd") + " " + e.getMessage());
+        }
+
+
     }
 
     @Override

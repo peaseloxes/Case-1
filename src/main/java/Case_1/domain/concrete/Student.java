@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public class Student extends RestObject implements Validatable {
     private String lastName;
     private String email;
     private Company company;
-    private List<Course> courses;
+    private List<Course> courses = new LinkedList<>();
     // private int privateId;
     // private int discountId;
 

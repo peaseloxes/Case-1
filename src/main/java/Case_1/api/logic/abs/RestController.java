@@ -12,7 +12,7 @@ import javax.ws.rs.core.Response;
  */
 public abstract class RestController<T extends Repository> {
 
-    /**
+     /**
      * Fetch the repository.
      *
      * @return a repository

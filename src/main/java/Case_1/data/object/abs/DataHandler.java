@@ -1,7 +1,6 @@
 package Case_1.data.object.abs;
 
 import Case_1.data.access.abs.DataConnectionException;
-import Case_1.domain.concrete.Student;
 
 import java.util.List;
 
@@ -52,5 +51,5 @@ public interface DataHandler<C, T> {
 
     boolean subscribeTo(T subscriber, int subscribableId) throws DataConnectionException;
 
-    List<Student> getStudentCoursesByYearWeek(int year, int week) throws DataConnectionException;
+    List<T> getStudentCoursesByYearWeek(int year, int week) throws DataConnectionException;
 }

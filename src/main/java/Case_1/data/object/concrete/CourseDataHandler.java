@@ -7,16 +7,16 @@ import Case_1.data.access.concrete.SQLQuery;
 import Case_1.data.object.abs.DataHandler;
 import Case_1.domain.concrete.Course;
 import Case_1.domain.concrete.CourseInstance;
+import Case_1.domain.concrete.Student;
 import Case_1.logic.concrete.CourseBuilder;
+import Case_1.logic.concrete.StudentBuilder;
 import Case_1.util.i18n.LangUtil;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Generated.
@@ -244,7 +244,99 @@ public class CourseDataHandler implements
 
     @Override
     public boolean subscribeTo(Course subscriber, int subscribableId) {
-        throw new UnsupportedOperationException("wut?");
+        throw new UnsupportedOperationException("Silly you, courses can't subscribe to anything");
+    }
+
+    /** TODO should be moved up to repository level,
+     // CourseRepository & StudentRepository should do the combining
+     // that way students remain in students and courses in courses
+     //
+     // merge with {@link StudentDataHandler#getStudentCoursesByYearWeek(int, int)}
+     //
+     // worst methods in entire application:
+     */
+    @Override
+    @Deprecated
+    public List<Course> getStudentCoursesByYearWeek(final int year, final int week) throws DataConnectionException {
+        List<Course> courses = new ArrayList<>();
+        try {
+            //select * from work_table where created_date beween to_date('9/18/2007','MM/DD/YYYY') and to_date('03/29/2008','MM/DD/YYYY')
+            connection.open();
+
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.WEEK_OF_YEAR, week - 1);
+
+            String startDate = format.format(calendar.getTime());
+            calendar.set(Calendar.WEEK_OF_YEAR, week);
+            String endDate = format.format(calendar.getTime());
+
+            String sql = "SELECT * FROM COURSEINSTANCE WHERE STARTDATE between to_date(?,'DD/MM/YYYY') and to_date(?,'DD/MM/YYYY')";
+            SQLQuery query = new SQLQuery();
+            query.setSql(sql);
+            query.addParam(startDate, SQLQuery.Type.STRING);
+            query.addParam(endDate, SQLQuery.Type.STRING);
+            DataResult courseInstances = connection.execute(query);
+
+            Iterator<Map<String,Object>> instanceIterator = courseInstances.getIterator();
+
+            while(instanceIterator.hasNext()) {
+                Map<String,Object> courseInstance = instanceIterator.next();
+                int courseId = ((BigDecimal) courseInstance.get("COURSEID")).intValue();
+                int courseInstanceId = ((BigDecimal) courseInstance.get("ID")).intValue();
+                sql = "SELECT * FROM COURSE WHERE ID = ?";
+                query = new SQLQuery();
+                query.setSql(sql);
+                query.addParam(courseId, SQLQuery.Type.INT);
+                DataResult courseResult = connection.execute(query);
+
+                Map<String,Object> courseResultMap = courseResult.getRow(0);
+
+                CourseBuilder courseBuilder = CourseBuilder.getInstance();
+                courseBuilder.id(((BigDecimal) courseResultMap.get("ID")).intValue())
+                        .title((String) courseResultMap.get("TITLE"))
+                        .code((String) courseResultMap.get("COURSECODE"))
+                        .duration(((BigDecimal) courseResultMap.get("DURATIONDAYS")).intValue())
+                        .maxApplicants(((BigDecimal) courseResultMap.get("MAXAPPLICANTS")).intValue());
+
+
+
+                sql = "SELECT * FROM STUDENT WHERE ID IN(SELECT ID FROM STUDENT_COURSEINSTANCE WHERE COURSEINSTANCEID = ?)";
+                query = new SQLQuery();
+                query.setSql(sql);
+                query.addParam(courseInstanceId, SQLQuery.Type.INT);
+                DataResult studentResult = connection.execute(query);
+
+                Iterator<Map<String,Object>> studentIterator = studentResult.getIterator();
+
+                List<Student> studentList = new LinkedList<>();
+                while (studentIterator.hasNext()){
+                    Map<String,Object> studentMap = studentIterator.next();
+
+                    StudentBuilder studentBuilder = StudentBuilder.getInstance();
+                    studentBuilder.id(((BigDecimal) studentMap.get("ID")).intValue())
+                            .firstName((String) studentMap.get("FIRSTNAME"))
+                            .lastName((String) studentMap.get("LASTNAME"))
+                            .email((String) studentMap.get("EMAIL"));
+                    studentList.add(studentBuilder.create());
+
+                }
+
+                courseBuilder.instance(
+                        ((BigDecimal) courseInstance.get("ID")).intValue(),
+                        ((Timestamp) courseInstance.get("STARTDATE")).toLocalDateTime(),
+                        ((Timestamp) courseInstance.get("ENDDATE")).toLocalDateTime(),
+                        ((BigDecimal) courseInstance.get("BASEPRICE")).doubleValue(),
+                        studentList
+                );
+                courses.add(courseBuilder.create());
+            }
+
+        }catch (DataConnectionException e) {
+            e.printStackTrace();
+        }
+        return courses;
     }
 
 

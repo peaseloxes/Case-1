@@ -8,14 +8,14 @@ import Case_1.data.object.abs.DataHandler;
 import Case_1.domain.concrete.Address;
 import Case_1.domain.concrete.Company;
 import Case_1.domain.concrete.Student;
+import Case_1.logic.concrete.CourseBuilder;
 import Case_1.logic.concrete.StudentBuilder;
 import Case_1.util.i18n.LangUtil;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by alex on 10/6/15.
@@ -62,7 +62,7 @@ public class StudentDataHandler implements
         return response;
     }
 
-    private void addStudent(final Student student) throws DataConnectionException{
+    private void addStudent(final Student student) throws DataConnectionException {
         int companyId = getCompanyId(student.getCompany());
         connection.open();
         String sql = "INSERT INTO STUDENT (ID,FIRSTNAME,LASTNAME,EMAIL,COMPANYID,PRIVATEID,DISCOUNTID)" +
@@ -137,11 +137,11 @@ public class StudentDataHandler implements
         DataResult result = connection.execute(query);
         connection.close();
 
-        if(result.isEmpty()){
+        if (result.isEmpty()) {
             // TODO langutil
             throw new DataConnectionException("Can't find company");
-        }else{
-            return ((BigDecimal)result.getRow(0).get("ID")).intValue();
+        } else {
+            return ((BigDecimal) result.getRow(0).get("ID")).intValue();
         }
     }
 
@@ -157,11 +157,11 @@ public class StudentDataHandler implements
         DataResult result = connection.execute(query);
         connection.close();
 
-        if(result.isEmpty()){
+        if (result.isEmpty()) {
             // TODO langutil
             throw new DataConnectionException("Can't find address");
-        }else{
-            return ((BigDecimal)result.getRow(0).get("ID")).intValue();
+        } else {
+            return ((BigDecimal) result.getRow(0).get("ID")).intValue();
         }
 
     }
@@ -187,10 +187,10 @@ public class StudentDataHandler implements
                 Map map = it.next();
 
                 StudentBuilder builder = StudentBuilder.getInstance();
-                builder .id(((BigDecimal) map.get("ID")).intValue())
+                builder.id(((BigDecimal) map.get("ID")).intValue())
                         .firstName((String) map.get("FIRSTNAME"))
-                        .lastName((String)map.get("LASTNAME"))
-                        .email((String)map.get("EMAIL"));
+                        .lastName((String) map.get("LASTNAME"))
+                        .email((String) map.get("EMAIL"));
 
 
                 sql = "SELECT * FROM COMPANY WHERE ID = ?";
@@ -199,7 +199,7 @@ public class StudentDataHandler implements
                 query.setSql(sql);
                 DataResult companyResult = connection.execute(query);
 
-                if(companyResult.isEmpty()){
+                if (companyResult.isEmpty()) {
                     throw new DataConnectionException("company not found");
                 }
 
@@ -210,7 +210,7 @@ public class StudentDataHandler implements
                 DataResult addressResult = connection.execute(query);
 
 
-                if(addressResult.isEmpty()){
+                if (addressResult.isEmpty()) {
                     throw new DataConnectionException("company not found");
                 }
 
@@ -245,7 +245,7 @@ public class StudentDataHandler implements
     }
 
     @Override
-    public boolean subscribeTo(final Student student, final int courseInstanceId) throws DataConnectionException{
+    public boolean subscribeTo(final Student student, final int courseInstanceId) throws DataConnectionException {
         int studentId = getStudentId(student);
         connection.open();
         String sql = "INSERT INTO STUDENT_COURSEINSTANCE (STUDENTID,COURSEINSTANCEID,APPLICATIONDATE) " +
@@ -259,22 +259,141 @@ public class StudentDataHandler implements
         return true;
     }
 
+    /** TODO should be moved up to repository level,
+    // CourseRepository & StudentRepository should do the combining
+    // that way students remain in students and courses in courses
+    //
+    // merge with {@link CourseDataHandler#getStudentCoursesByYearWeek(int, int)}
+    //
+    // worst methods in entire application:
+     */
     @Override
-    public List<Student> getStudentCoursesByYearWeek(final int year,final int week) throws DataConnectionException{
+    @Deprecated
+    public List<Student> getStudentCoursesByYearWeek(final int year, final int week) throws DataConnectionException {
         List<Student> students = new ArrayList<>();
+        try {
+            //select * from work_table where created_date beween to_date('9/18/2007','MM/DD/YYYY') and to_date('03/29/2008','MM/DD/YYYY')
+            connection.open();
 
-        //select * from work_table where created_date beween to_date('9/18/2007','MM/DD/YYYY') and to_date('03/29/2008','MM/DD/YYYY')
-        connection.open();
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.WEEK_OF_YEAR, week - 1);
 
-        // get all courses+instances in this week
+            String startDate = format.format(calendar.getTime());
+            calendar.set(Calendar.WEEK_OF_YEAR, week);
 
-        String sql = "SELECT * FROM STUDENT ORDER BY ID";
-        SQLQuery query = new SQLQuery();
-        query.setSql(sql);
-        DataResult studentResult = connection.execute(query);
+            String endDate = format.format(calendar.getTime());
 
+            // get all courses+instances in this week
+
+            String sql = "SELECT * FROM STUDENT WHERE ID IN ( " +
+                    "SELECT ID FROM STUDENT_COURSEINSTANCE WHERE COURSEINSTANCEID IN ( " +
+                    "SELECT ID FROM COURSEINSTANCE WHERE " +
+                    "STARTDATE between to_date(?,'DD/MM/YYYY') and to_date(?,'DD/MM/YYYY')))";
+
+            SQLQuery query = new SQLQuery();
+            query.setSql(sql);
+            query.addParam(startDate, SQLQuery.Type.STRING);
+            query.addParam(endDate, SQLQuery.Type.STRING);
+            DataResult studentResult = connection.execute(query);
+
+
+            Iterator<Map<String, Object>> it = studentResult.getIterator();
+            while (it.hasNext()) {
+                Map studentMap = it.next();
+
+                StudentBuilder studentBuilder = StudentBuilder.getInstance();
+                studentBuilder.id(((BigDecimal) studentMap.get("ID")).intValue())
+                        .firstName((String) studentMap.get("FIRSTNAME"))
+                        .lastName((String) studentMap.get("LASTNAME"))
+                        .email((String) studentMap.get("EMAIL"));
+
+
+                sql = "SELECT * FROM COMPANY WHERE ID = ?";
+                query = new SQLQuery();
+                query.addParam(((BigDecimal) studentMap.get("COMPANYID")).intValue(), SQLQuery.Type.INT);
+                query.setSql(sql);
+                DataResult companyResult = connection.execute(query);
+
+                if (companyResult.isEmpty()) {
+                    throw new DataConnectionException("company not found");
+                }
+
+                sql = "SELECT * FROM ADDRESS WHERE ID = ?";
+                query = new SQLQuery();
+                query.addParam(((BigDecimal) companyResult.getRow(0).get("ADDRESSID")).intValue(), SQLQuery.Type.INT);
+                query.setSql(sql);
+                DataResult addressResult = connection.execute(query);
+
+
+                if (addressResult.isEmpty()) {
+                    throw new DataConnectionException("company not found");
+                }
+
+                Map<String, Object> companyMap = companyResult.getRow(0);
+                Map<String, Object> addressMap = addressResult.getRow(0);
+
+                studentBuilder.addressCompany(
+                        ((BigDecimal) companyMap.get("ID")).intValue(),
+                        (String) companyMap.get("NAME"),
+                        (String) companyMap.get("BIDNUMER"),
+                        (String) companyMap.get("ACCOUNTNUMBER"),
+                        (String) companyMap.get("PHONENUMBER"),
+                        (String) companyMap.get("DEPARTMENT"),
+                        ((BigDecimal) addressMap.get("ID")).intValue(),
+                        (String) addressMap.get("STREETNUMBER"),
+                        (String) addressMap.get("STREETNAME"),
+                        (String) addressMap.get("POSTALCODE"),
+                        (String) addressMap.get("CITY")
+                );
+
+                sql = "SELECT * FROM COURSEINSTANCE WHERE ID IN (SELECT COURSEINSTANCEID FROM STUDENT_COURSEINSTANCE WHERE STUDENTID = ? )";
+                query = new SQLQuery();
+                query.setSql(sql);
+                query.addParam(((BigDecimal) studentMap.get("ID")).intValue(), SQLQuery.Type.INT);
+                DataResult courseInstances = connection.execute(query);
+
+                Iterator<Map<String,Object>> instanceIterator = courseInstances.getIterator();
+
+                while(instanceIterator.hasNext()) {
+                    Map<String,Object> courseInstance = instanceIterator.next();
+                    int courseId = ((BigDecimal) courseInstance.get("COURSEID")).intValue();
+
+                    sql = "SELECT * FROM COURSE WHERE ID = ?";
+                    query = new SQLQuery();
+                    query.setSql(sql);
+                    query.addParam(courseId, SQLQuery.Type.INT);
+                    DataResult courseResult = connection.execute(query);
+
+                    Map<String,Object> courseResultMap = courseResult.getRow(0);
+
+                    CourseBuilder courseBuilder = CourseBuilder.getInstance();
+                    courseBuilder.id(((BigDecimal) courseResultMap.get("ID")).intValue())
+                            .title((String) courseResultMap.get("TITLE"))
+                            .code((String) courseResultMap.get("COURSECODE"))
+                            .duration(((BigDecimal) courseResultMap.get("DURATIONDAYS")).intValue())
+                            .maxApplicants(((BigDecimal) courseResultMap.get("MAXAPPLICANTS")).intValue());
+
+                    courseBuilder.instance(
+                            ((BigDecimal) courseInstance.get("ID")).intValue(),
+                            ((Timestamp) courseInstance.get("STARTDATE")).toLocalDateTime(),
+                            ((Timestamp) courseInstance.get("ENDDATE")).toLocalDateTime(),
+                            ((BigDecimal) courseInstance.get("BASEPRICE")).doubleValue()
+                    );
+
+                    studentBuilder.addCourse(courseBuilder.create());
+                }
+
+                students.add(studentBuilder.create());
+            }
+        }catch (DataConnectionException e) {
+            e.printStackTrace();
+        }
         return students;
     }
+
+
 
     private int getStudentId(final Student student) throws DataConnectionException {
         connection.open();
@@ -286,11 +405,11 @@ public class StudentDataHandler implements
         DataResult result = connection.execute(query);
         connection.close();
 
-        if(result.isEmpty()){
+        if (result.isEmpty()) {
             // TODO langutil
             throw new DataConnectionException("Can't find student");
-        }else{
-            return ((BigDecimal)result.getRow(0).get("ID")).intValue();
+        } else {
+            return ((BigDecimal) result.getRow(0).get("ID")).intValue();
         }
     }
 }

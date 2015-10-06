@@ -131,7 +131,8 @@ public class CourseRepositoryTest {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 false,
-                0D
+                0D,
+                null
         );
         list.add(instance);
         course.setInstances(list);

@@ -1,5 +1,6 @@
 package Case_1.api.logic.concrete;
 
+import Case_1.api.domain.concrete.Pagination;
 import Case_1.api.logic.abs.RestController;
 import Case_1.api.util.RestUtil;
 import Case_1.data.access.concrete.OracleDataConnection;
@@ -38,7 +39,7 @@ public class StudentController extends RestController<StudentRepository> {
 
     // for the general controller
     private static final String BY_ID = "/students/";
-    private static final String BY_WEEK = "/students/{year}/{week}";
+    private static final String BY_WEEK = "/{year}/{week}";
     private static final String CREATE = "/create";
     private static final String NAME = "Students";
 
@@ -79,14 +80,24 @@ public class StudentController extends RestController<StudentRepository> {
     }
 
     @GET
-    @Path(StudentController.BY_WEEK)
+    @Path(BY_WEEK)
     public Response getByWeek(
             @PathParam("year") final int year,
             @PathParam("week") final int week
 
     ) {
-        getRepository().getStudentCoursesByYearWeek(year, week);
-        return null;
+        try {
+            Pagination<Student> page = new Pagination<>(getIdUrl(),0,0,  getRepository().getStudentCoursesByYearWeek(year, week));
+
+            // TODO year transfer
+            page.setPrev("/"+year+"/"+(week-1));
+            page.setNext("/"+year+"/"+(week+1));
+            return RestUtil.buildResponse(page,"Students by week");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return RestUtil.buildMessageResponse(LangUtil.labelFor("sdfsfdsfdsfd") + " " + e.getMessage());
+        }
+
 
     }
 

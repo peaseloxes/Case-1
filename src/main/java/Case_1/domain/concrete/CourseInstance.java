@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Generated.
@@ -26,6 +28,7 @@ public class CourseInstance extends RestObject implements Validatable {
     private LocalDateTime endDate;
     private boolean definitive;
     private Double basePrice;
+    private List<Student> students = new LinkedList<>();
 
     @Override
     public boolean validate() {

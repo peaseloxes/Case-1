@@ -3,7 +3,6 @@ package Case_1.data.logic.abs;
 import Case_1.data.access.abs.DataConnection;
 import Case_1.data.access.abs.DataConnectionException;
 import Case_1.data.object.abs.DataHandler;
-import Case_1.domain.concrete.Student;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class DataSource<T> {
         return handler.subscribeTo(subscriber, subscribableId);
     }
 
-    public List<Student> getStudentCoursesByYearWeek(final int year, final int week) throws DataConnectionException{
+    public List<T> getStudentCoursesByYearWeek(final int year, final int week) throws DataConnectionException{
         return handler.getStudentCoursesByYearWeek(year,week);
     }
 }
