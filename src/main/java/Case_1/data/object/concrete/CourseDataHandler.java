@@ -42,7 +42,7 @@ public class CourseDataHandler implements
         Course course = null;
         try {
             connection.open();
-            String sql = "SELECT * FROM COURSE WHERE ID = ? LIMIT 1";
+            String sql = "SELECT * FROM COURSE WHERE ID = ?";
             SQLQuery query = new SQLQuery();
             query.setSql(sql);
             query.addParam(id, SQLQuery.Type.INT);
@@ -174,6 +174,77 @@ public class CourseDataHandler implements
         return courses;
     }
 
+    @Override
+    public List<Course> getAll() {
+        List<Course> courses = new ArrayList<>();
+        try {
+            connection.open();
+            String sql = "SELECT * FROM COURSE ORDER BY ID";
+            SQLQuery query = new SQLQuery();
+            query.setSql(sql);
+
+            DataResult result = connection.execute(query);
+
+            Iterator<Map<String, Object>> it = result.getIterator();
+
+            while (it.hasNext()) {
+                Map<String, Object> map = it.next();
+                CourseBuilder builder = CourseBuilder.getInstance();
+
+                SQLQuery instanceQuery = new SQLQuery();
+                instanceQuery.setSql("SELECT * FROM COURSEINSTANCE WHERE COURSEID = ?");
+                instanceQuery.addParam(((BigDecimal) map.get("ID")).intValue(), SQLQuery.Type.INT);
+
+                builder
+                        .id(((BigDecimal) map.get("ID")).intValue())
+                        .title((String) map.get("TITLE"))
+                        .code((String) map.get("COURSECODE"))
+                        .duration(((BigDecimal) map.get("DURATIONDAYS")).intValue())
+                        .maxApplicants(((BigDecimal) map.get("MAXAPPLICANTS")).intValue());
+
+                DataResult instanceResult = connection.execute(instanceQuery);
+
+                Iterator<Map<String, Object>> itt = instanceResult.getIterator();
+                while (itt.hasNext()) {
+                    Map<String, Object> instance = itt.next();
+                    builder.instance(
+                            ((BigDecimal) map.get("ID")).intValue(),
+                            ((Timestamp) instance.get("STARTDATE")).toLocalDateTime(),
+                            ((Timestamp) instance.get("ENDDATE")).toLocalDateTime(),
+                            ((BigDecimal) instance.get("BASEPRICE")).doubleValue()
+                    );
+                }
+
+                Course course = builder.create();
+                courses.add(course);
+            }
+            connection.close();
+        } catch (DataConnectionException | NullPointerException e) {
+            // will only throw DataConnection exception on opening or closing:
+            // if on opening, there's no connection to be closed
+            // if on closing no sense in trying again
+            // hence no finally with connection.close()
+            //
+            // connection.execute() will close on its own if
+            // exception is encountered
+            e.printStackTrace();
+        }
+        return courses;
+    }
+
+    @Override
+    public List<Course> getAll(final int start, final int limit) {
+//        select * from
+//                ( select a.*, ROWNUM rnum from
+//                        ( <your_query_goes_here, with order by> ) a
+//        where ROWNUM <= :MAX_ROW_TO_FETCH )
+//        where rnum  >= :MIN_ROW_TO_FETCH;
+//
+
+
+        return null;
+    }
+
 
     private boolean courseExists(final String code) throws DataConnectionException {
         connection.open();
@@ -221,7 +292,7 @@ public class CourseDataHandler implements
         if (result.isEmpty()) {
             throw new DataConnectionException("");
         } else {
-            return ((BigDecimal)result.getRow(0).get("ID")).intValue();
+            return ((BigDecimal) result.getRow(0).get("ID")).intValue();
         }
     }
 

@@ -102,7 +102,7 @@ public class CourseControllerTest {
 
     @Test
     public void testGet() throws Exception {
-        assertThat(controller.get(5, 5), instanceOf(Response.class));
+        assertThat(controller.get(), instanceOf(Response.class));
     }
 
     private void createTestFile() throws IOException {

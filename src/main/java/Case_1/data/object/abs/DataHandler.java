@@ -42,4 +42,8 @@ public interface DataHandler<C, T> {
      * @return the item(s)
      */
     List<T> getByKey(String key, Object value);
+
+    List<T> getAll();
+
+    List<T> getAll(final int start, final int limit);
 }

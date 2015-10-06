@@ -24,6 +24,11 @@ public abstract class Repository<T> {
         return dataSource.findById(id);
     }
 
+    public List<T> getAll() {
+        return getDataSource()
+                .getAll();
+    }
+
     /**
      * Get <b>limit</b> items starting from <b>start</b>.
      *

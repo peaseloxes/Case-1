@@ -29,7 +29,7 @@ public class DataSource<T> {
     }
 
     public List<T> getAll() {
-        return null;
+        return handler.getAll();
     }
 
     public List<T> getAll(final int start) {
@@ -37,7 +37,7 @@ public class DataSource<T> {
     }
 
     public List<T> getAll(final int start, final int limit) {
-        return null;
+        return handler.getAll(start, limit);
     }
 
     public List<T> findWhere(final String[] keys, final Object[] values) {

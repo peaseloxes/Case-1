@@ -4,9 +4,7 @@ import Case_1.api.domain.concrete.Pagination;
 import Case_1.api.util.RestUtil;
 import Case_1.data.logic.abs.Repository;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 /**
@@ -38,16 +36,29 @@ public abstract class RestController<T extends Repository> {
     /**
      * General get all things.
      *
-     * @param start starting position
-     * @param limit amount of items.
      * @return a Response
      */
     @GET
-    public Response get(@DefaultValue("0") @QueryParam("start") final int start,
-                              @DefaultValue("10") @QueryParam("limit") final int limit) {
+    public Response get() {
         return RestUtil.buildResponse(
-                new Pagination<>(getIdUrl(), start, limit, getRepository().getAll(start, limit)),
+                new Pagination<>(getIdUrl(), 0, 0, getRepository().getAll()),
                 getName()
         );
     }
+
+//    /**
+//     * General get all things.
+//     *
+//     * @param start starting position
+//     * @param limit amount of items.
+//     * @return a Response
+//     */
+//    @GET
+//    public Response get(@DefaultValue("0") @QueryParam("start") final int start,
+//                              @DefaultValue("10") @QueryParam("limit") final int limit) {
+//        return RestUtil.buildResponse(
+//                new Pagination<>(getIdUrl(), start, limit, getRepository().getAll(start, limit)),
+//                getName()
+//        );
+//    }
 }
