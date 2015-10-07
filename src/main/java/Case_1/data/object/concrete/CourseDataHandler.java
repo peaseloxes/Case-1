@@ -205,7 +205,7 @@ public class CourseDataHandler implements
                 while (itt.hasNext()) {
                     Map<String, Object> instance = itt.next();
                     builder.instance(
-                            ((BigDecimal) map.get("ID")).intValue(),
+                            ((BigDecimal) instance.get("ID")).intValue(),
                             ((Timestamp) instance.get("STARTDATE")).toLocalDateTime(),
                             ((Timestamp) instance.get("ENDDATE")).toLocalDateTime(),
                             ((BigDecimal) instance.get("BASEPRICE")).doubleValue()
@@ -227,19 +227,6 @@ public class CourseDataHandler implements
             e.printStackTrace();
         }
         return courses;
-    }
-
-    @Override
-    public List<Course> getAll(final int start, final int limit) {
-//        select * from
-//                ( select a.*, ROWNUM rnum from
-//                        ( <your_query_goes_here, with order by> ) a
-//        where ROWNUM <= :MAX_ROW_TO_FETCH )
-//        where rnum  >= :MIN_ROW_TO_FETCH;
-//
-
-
-        return null;
     }
 
     @Override

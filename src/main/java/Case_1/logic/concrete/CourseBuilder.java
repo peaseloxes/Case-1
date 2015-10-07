@@ -147,6 +147,12 @@ public class CourseBuilder implements Builder<CourseBuilder, Course> {
         return this;
     }
 
+    /**
+     * Add a code to this course.
+     *
+     * @param code the code
+     * @return this builder instance
+     */
     public CourseBuilder code(final String code) {
         course.setCode(code);
         return this;

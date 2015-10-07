@@ -54,6 +54,13 @@ public class SQLQuery {
         private Integer type;
     }
 
+    /**
+     * Provides conversion between java types and sql data types.
+     * <p>
+     * usage:
+     * <p>
+     * Type.INT > if a java integer needs storing
+     */
     public enum Type {
         // see
         // https://docs.oracle.com/cd/A87860_01/doc/java.817/a83724/basic3.htm

@@ -63,18 +63,6 @@ public class CourseRepository extends Repository<Course> {
     }
 
     /**
-     * Get all courses.
-     *
-     * @param start starting from
-     * @return all courses starting from <b>start</b>
-     */
-    public List<Course> getAll(final int start) {
-        return getDataSource()
-                .getAll(start);
-    }
-
-
-    /**
      * Adds a course to the datasource of this repository.
      *
      * @param course the course to add
@@ -84,6 +72,13 @@ public class CourseRepository extends Repository<Course> {
         return getDataSource().add(course);
     }
 
+    /**
+     * Add all courses in the list to the datasoure of this repository.
+     *
+     * @param list the list of courses to add
+     * @return true if successful
+     * @throws DataConnectionException if the courses could not be added
+     */
     public boolean addAll(final List<Course> list) throws DataConnectionException {
         for (Course course : list) {
             addCourse(course);
@@ -91,7 +86,15 @@ public class CourseRepository extends Repository<Course> {
         return true;
     }
 
+    /**
+     * TODO should not be in CourseRepository, move up!
+     *
+     * @param year thhe year
+     * @param week the week
+     * @return corresponding items
+     * @throws DataConnectionException if items could not be found
+     */
     public List<Course> getStudentCoursesByYearWeek(final int year, final int week) throws DataConnectionException {
-        return getDataSource().getStudentCoursesByYearWeek(year,week);
+        return getDataSource().getStudentCoursesByYearWeek(year, week);
     }
 }

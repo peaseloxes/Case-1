@@ -17,28 +17,33 @@ public abstract class Repository<T> {
     @Getter(AccessLevel.PROTECTED)
     private DataSource<T> dataSource;
 
+    /**
+     * Constructor with injection.
+     *
+     * @param dataSource the datasource to use
+     */
     public Repository(final DataSource<T> dataSource) {
         this.dataSource = dataSource;
     }
 
+    /**
+     * Find an item given its id.
+     *
+     * @param id the id
+     * @return the corresponding item
+     * @throws DataConnectionException if item can not be found
+     */
     public T getById(final int id) throws DataConnectionException {
         return dataSource.findById(id);
     }
 
+    /**
+     * Fetches all items in the repository.
+     *
+     * @return all the items
+     */
     public List<T> getAll() {
         return getDataSource()
                 .getAll();
-    }
-
-    /**
-     * Get <b>limit</b> items starting from <b>start</b>.
-     *
-     * @param start where to start
-     * @param limit amount of courses
-     * @return courses from <b>start</b> to <b>start + limit</b>
-     */
-    public List<T> getAll(final int start, final int limit) {
-        return getDataSource()
-                .getAll(start, limit);
     }
 }

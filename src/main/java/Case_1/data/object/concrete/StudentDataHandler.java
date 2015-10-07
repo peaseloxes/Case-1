@@ -197,8 +197,7 @@ public class StudentDataHandler implements
         connection.close();
 
         if (result.isEmpty()) {
-            // TODO langutil
-            throw new DataConnectionException("Can't find company");
+            throw new DataConnectionException(LangUtil.labelFor("error.company.notFound"));
         } else {
             return ((BigDecimal) result.getRow(0).get("ID")).intValue();
         }
@@ -217,8 +216,7 @@ public class StudentDataHandler implements
         connection.close();
 
         if (result.isEmpty()) {
-            // TODO langutil
-            throw new DataConnectionException("Can't find address");
+            throw new DataConnectionException(LangUtil.labelFor("error.address.notFound"));
         } else {
             return ((BigDecimal) result.getRow(0).get("ID")).intValue();
         }
@@ -299,11 +297,6 @@ public class StudentDataHandler implements
     }
 
     @Override
-    public List<Student> getAll(int start, int limit) {
-        return null;
-    }
-
-    @Override
     public boolean subscribeTo(final Student student, final int courseInstanceId) throws DataConnectionException {
         int studentId = getStudentId(student);
         connection.open();
@@ -341,7 +334,6 @@ public class StudentDataHandler implements
 
             String startDate = format.format(calendar.getTime());
             calendar.set(Calendar.WEEK_OF_YEAR, week);
-
             String endDate = format.format(calendar.getTime());
 
             // get all courses+instances in this week
@@ -376,7 +368,7 @@ public class StudentDataHandler implements
                 DataResult companyResult = connection.execute(query);
 
                 if (companyResult.isEmpty()) {
-                    throw new DataConnectionException("company not found");
+                    throw new DataConnectionException(LangUtil.labelFor("error.company.notFound"));
                 }
 
                 sql = "SELECT * FROM ADDRESS WHERE ID = ?";
@@ -387,7 +379,7 @@ public class StudentDataHandler implements
 
 
                 if (addressResult.isEmpty()) {
-                    throw new DataConnectionException("company not found");
+                    throw new DataConnectionException(LangUtil.labelFor("error.address.notFound"));
                 }
 
                 Map<String, Object> companyMap = companyResult.getRow(0);
@@ -465,8 +457,7 @@ public class StudentDataHandler implements
         connection.close();
 
         if (result.isEmpty()) {
-            // TODO langutil
-            throw new DataConnectionException("Can't find student");
+            throw new DataConnectionException(LangUtil.labelFor("error.student.notFound"));
         } else {
             return ((BigDecimal) result.getRow(0).get("ID")).intValue();
         }

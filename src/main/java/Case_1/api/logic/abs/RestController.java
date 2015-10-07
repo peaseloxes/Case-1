@@ -45,20 +45,4 @@ public abstract class RestController<T extends Repository> {
                 getName()
         );
     }
-
-//    /**
-//     * General get all things.
-//     *
-//     * @param start starting position
-//     * @param limit amount of items.
-//     * @return a Response
-//     */
-//    @GET
-//    public Response get(@DefaultValue("0") @QueryParam("start") final int start,
-//                              @DefaultValue("10") @QueryParam("limit") final int limit) {
-//        return RestUtil.buildResponse(
-//                new Pagination<>(getIdUrl(), start, limit, getRepository().getAll(start, limit)),
-//                getName()
-//        );
-//    }
 }

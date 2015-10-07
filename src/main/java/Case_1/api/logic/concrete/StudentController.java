@@ -3,15 +3,14 @@ package Case_1.api.logic.concrete;
 import Case_1.api.domain.concrete.Pagination;
 import Case_1.api.logic.abs.RestController;
 import Case_1.api.util.RestUtil;
+import Case_1.data.access.abs.DataConnectionException;
 import Case_1.data.access.concrete.OracleDataConnection;
 import Case_1.data.logic.abs.DataSource;
-import Case_1.data.logic.concrete.CourseRepository;
 import Case_1.data.logic.concrete.StudentRepository;
-import Case_1.data.object.concrete.CourseDataHandler;
 import Case_1.data.object.concrete.StudentDataHandler;
-import Case_1.domain.concrete.Course;
 import Case_1.domain.concrete.Student;
 import Case_1.logic.concrete.StudentBuilder;
+import Case_1.util.DateUtil;
 import Case_1.util.i18n.LangUtil;
 import lombok.NoArgsConstructor;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -29,6 +28,7 @@ import java.util.Arrays;
 @NoArgsConstructor
 public class StudentController extends RestController<StudentRepository> {
 
+    // for injection, if desired
     private StudentRepository repository;
 
     public StudentController(final StudentRepository repository) {
@@ -39,7 +39,7 @@ public class StudentController extends RestController<StudentRepository> {
     public static final String ROOT = "/students";
 
     // for the general controller
-    private static final String BY_ID = "/{id}";
+    private static final String BY_ID = "/";
     private static final String BY_WEEK = "/{year}/{week}";
     private static final String CREATE = "/create";
     private static final String NAME = "Students";
@@ -47,18 +47,23 @@ public class StudentController extends RestController<StudentRepository> {
     @GET
     @Path(BY_ID)
     public Response getById(@PathParam("id") final int id) {
-        try{
-            Pagination<Student> pagination = new Pagination("/",0,0, Arrays.asList(getRepository().getById(id)));
-            // TODO prevent neg infinite etc.
-            pagination.setNext("/"+(id-1));
-            pagination.setPrev("/"+(id+1));
-            return RestUtil.buildResponse(pagination,"Student");
-        } catch (Exception e){
-            // TODO lang
-            e.printStackTrace();
-            return RestUtil.buildMessageResponse(LangUtil.labelFor("sdfsfdsfdsfd") + " " + e.getMessage());
-        }
+        try {
+            Pagination<Student> pagination = new Pagination("/", 0, 0, Arrays.asList(getRepository().getById(id)));
+            pagination.setNext("/" + (id - 1));
+            pagination.setPrev("/" + (id + 1));
+            if (id < 0) {
+                pagination.setPrev("");
+            }
+            return RestUtil.buildResponse(pagination, "Student");
+        } catch (DataConnectionException e) {
 
+            // we wrote proper messages, so add error message for user info
+            return RestUtil.buildMessageResponse(LangUtil.labelFor("error.student.notFound") + " " + e.getMessage());
+        } catch (Exception e) {
+
+            // who knows what's in here, don't return its message
+            return RestUtil.buildMessageResponse(LangUtil.labelFor("error.student.notFound"));
+        }
     }
 
     @POST
@@ -79,19 +84,36 @@ public class StudentController extends RestController<StudentRepository> {
 //            @FormDataParam("postalCode") final String postalCode,
 //            @FormDataParam("city") final String city
     ) {
-        StudentBuilder builder = StudentBuilder.getInstance();
-        Student student = builder.firstName(firstName)
+        StudentBuilder studentBuilder = StudentBuilder.getInstance();
+        Student student = studentBuilder
+                .firstName(firstName)
                 .lastName(lastName)
                 .email("email")
-                .addressCompany(0, companyName, bidNumber, "accountNumber", "phoneNumber", department, 0, "streetNumber", "streetName", "postalCode", "city")
+                .addressCompany(
+                        0,
+                        companyName,
+                        bidNumber,
+                        "accountNumber",
+                        "phoneNumber",
+                        department,
+                        0,
+                        "streetNumber",
+                        "streetName",
+                        "postalCode",
+                        "city")
                 .create();
         try {
             getRepository().add(student);
             int instanceId = Integer.valueOf(courseInstanceId);
             getRepository().subscribeTo(student, instanceId);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (DataConnectionException e) {
+
+            // we wrote proper messages, so add error message for user info
             return RestUtil.buildMessageResponse(LangUtil.labelFor("error.user.notCreated") + " " + e.getMessage());
+        } catch (Exception e) {
+
+            // who knows what's in here, don't return its message
+            return RestUtil.buildMessageResponse(LangUtil.labelFor("error.user.notCreated"));
         }
 
         return RestUtil.buildMessageResponse(LangUtil.labelFor("success.user.created"));
@@ -105,16 +127,22 @@ public class StudentController extends RestController<StudentRepository> {
 
     ) {
         try {
-            Pagination<Student> page = new Pagination<>(getIdUrl(),0,0,  getRepository().getStudentCoursesByYearWeek(year, week));
+            Pagination<Student> page = new Pagination<>(
+                    getIdUrl(),
+                    0,
+                    0,
+                    getRepository().getStudentCoursesByYearWeek(year, week));
+            page.setPrev(DateUtil.getPreviousYearWeek(year, week));
+            page.setNext(DateUtil.getNextYearWeek(year, week));
+            return RestUtil.buildResponse(page, "Students by week");
+        } catch (DataConnectionException e) {
 
-            // TODO year transfer
-            page.setPrev("/"+year+"/"+(week-1));
-            page.setNext("/" + year + "/" + (week + 1));
-            return RestUtil.buildResponse(page,"Students by week");
+            // we wrote proper messages, so add error message for user info
+            return RestUtil.buildMessageResponse(LangUtil.labelFor("error.student.notFound") + " " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            // TODO lang
-            return RestUtil.buildMessageResponse(LangUtil.labelFor("sdfsfdsfdsfd") + " " + e.getMessage());
+
+            // who knows what's in here, don't return its message
+            return RestUtil.buildMessageResponse(LangUtil.labelFor("error.student.notFound"));
         }
 
 
@@ -132,16 +160,6 @@ public class StudentController extends RestController<StudentRepository> {
             );
         }
         return repository;
-    }
-
-    private CourseRepository getCourseRepository(){
-        return new CourseRepository(
-                new DataSource<Course>(
-                        new CourseDataHandler(
-                                new OracleDataConnection()
-                        )
-                )
-        );
     }
 
     @Override

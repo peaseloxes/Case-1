@@ -39,17 +39,36 @@ public interface DataHandler<C, T> {
     /**
      * Finds an item by column / value pair.
      *
-     * @param key column name
+     * @param key   column name
      * @param value required value
      * @return the item(s)
      */
     List<T> getByKey(String key, Object value);
 
+    /**
+     * Get all items.
+     *
+     * @return all items
+     */
     List<T> getAll();
 
-    List<T> getAll(final int start, final int limit);
-
+    /**
+     * TODO should not be in datahandler, move up!
+     *
+     * @param subscriber     the subscriber
+     * @param subscribableId the subscribable id
+     * @return true if subscribed
+     * @throws DataConnectionException if subscription not possible
+     */
     boolean subscribeTo(T subscriber, int subscribableId) throws DataConnectionException;
 
+    /**
+     * TODO should not be in datahandler, move up!
+     *
+     * @param year the year
+     * @param week the week
+     * @return the list of items matching week/year
+     * @throws DataConnectionException if no items could be found
+     */
     List<T> getStudentCoursesByYearWeek(int year, int week) throws DataConnectionException;
 }

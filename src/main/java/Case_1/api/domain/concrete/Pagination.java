@@ -2,6 +2,7 @@ package Case_1.api.domain.concrete;
 
 import Case_1.util.pref.Property;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.LinkedList;
@@ -12,21 +13,18 @@ import java.util.List;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class Pagination<T> {
     private String prev = "";
     private String next = "";
     private List<T> elements = new LinkedList<>();
 
-    public Pagination() {
-
-    }
-
     public Pagination(final String url, final int start, final int limit, List<T> items) {
         this.elements = items;
-        if(elements == null) {
+
+        if (elements == null) {
             elements = new LinkedList<>();
         }
-
 
         if (start > limit) {
             setPrev(url + "?" + Property.REST_START + "=" + (start
