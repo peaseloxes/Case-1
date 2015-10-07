@@ -21,6 +21,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,7 +42,7 @@ public class CourseController extends RestController<CourseRepository> {
     public static final String ROOT = "/courses";
 
     // for the general controller
-    private static final String BY_ID = "/";
+    private static final String BY_ID = "/{id}";
     private static final String BY_WEEK = "/{year}/{week}";
     private static final String CREATE = "/create";
     private static final String NAME = "Courses";
@@ -117,6 +118,18 @@ public class CourseController extends RestController<CourseRepository> {
             // who knows what's in here, don't return its message
             return RestUtil.buildMessageResponse(LangUtil.labelFor("error.courses.notFound"));
         }
+    }
+
+    @GET
+    @Path(BY_ID)
+    public Response getById(@PathParam("id") final int id) throws DataConnectionException {
+        Pagination page = new Pagination<>(getIdUrl(), 0, 0, Arrays.asList(getRepository().getById(id)));
+        page.setPrev("/" + (id-1));
+        page.setNext("/" + (id+1));
+        return RestUtil.buildResponse(
+                page,
+                getName()
+        );
     }
 
     @Override

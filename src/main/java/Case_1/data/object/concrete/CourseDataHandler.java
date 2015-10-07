@@ -49,16 +49,16 @@ public class CourseDataHandler implements
             query.addParam(id, SQLQuery.Type.INT);
 
             DataResult result = connection.execute(query);
-
             if (!result.isEmpty()) {
                 // TODO use builder and make sure validity is ok, also course instances
-                course = new Course(
-                        (Integer) result.getRow(0).get("id"),
-                        (String) result.getRow(0).get("name"),
-                        (String) result.getRow(0).get("code"),
-                        (Integer) result.getRow(0).get("duration"),
-                        (Integer) result.getRow(0).get("applicants"),
-                        null);
+                Map<String, Object> map = result.getRow(0);
+                course = CourseBuilder.getInstance()
+                        .id(((BigDecimal) map.get("ID")).intValue())
+                        .title((String) map.get("TITLE"))
+                        .code((String) map.get("COURSECODE"))
+                        .duration(((BigDecimal) map.get("DURATIONDAYS")).intValue())
+                        .maxApplicants(((BigDecimal) map.get("MAXAPPLICANTS")).intValue())
+                        .create();
             }
             connection.close();
         } catch (DataConnectionException | NullPointerException e) {
@@ -69,6 +69,7 @@ public class CourseDataHandler implements
             //
             // connection.execute() will close on its own if
             // exception is encountered
+            e.printStackTrace();
         }
         return course;
     }
@@ -80,6 +81,7 @@ public class CourseDataHandler implements
         try {
             if (!courseExists(course.getCode())) {
                 addCourse(course);
+                response = true;
             }
             int courseid = getCourseIdByCode(course.getCode());
             for (CourseInstance courseInstance : course.getInstances()) {
@@ -286,8 +288,6 @@ public class CourseDataHandler implements
                         .code((String) courseResultMap.get("COURSECODE"))
                         .duration(((BigDecimal) courseResultMap.get("DURATIONDAYS")).intValue())
                         .maxApplicants(((BigDecimal) courseResultMap.get("MAXAPPLICANTS")).intValue());
-
-
 
                 sql = "SELECT * FROM STUDENT WHERE ID IN(SELECT ID FROM STUDENT_COURSEINSTANCE WHERE COURSEINSTANCEID = ?)";
                 query = new SQLQuery();

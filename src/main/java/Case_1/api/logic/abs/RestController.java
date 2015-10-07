@@ -41,7 +41,7 @@ public abstract class RestController<T extends Repository> {
     @GET
     public Response get() {
         return RestUtil.buildResponse(
-                new Pagination<>(getIdUrl(), 0, 0, getRepository().getAll()),
+                new Pagination<>("/", 0, 0, getRepository().getAll()),
                 getName()
         );
     }

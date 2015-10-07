@@ -45,6 +45,11 @@ public class StudentDataHandler implements
         query.addParam(id, SQLQuery.Type.INT);
 
         DataResult studentResult = connection.execute(query);
+
+        if(studentResult.isEmpty()) {
+            throw new DataConnectionException(LangUtil.labelFor("error.student.notFound"));
+        }
+
         Map<String, Object> studentMap = studentResult.getRow(0);
         StudentBuilder studentBuilder = StudentBuilder.getInstance();
         studentBuilder.id(((BigDecimal) studentMap.get("ID")).intValue())
@@ -114,6 +119,7 @@ public class StudentDataHandler implements
             // add student
             if (!studentExists(student.getFirstName(), student.getLastName())) {
                 addStudent(student);
+                response = true;
             }
         } catch (NullPointerException e) {
             throw new DataConnectionException(LangUtil.labelFor("error.course.addition"));
