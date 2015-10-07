@@ -10,12 +10,15 @@ import Case_1.domain.concrete.Company;
 import Case_1.domain.concrete.Student;
 import Case_1.logic.concrete.CourseBuilder;
 import Case_1.logic.concrete.StudentBuilder;
+import Case_1.util.DateUtil;
 import Case_1.util.i18n.LangUtil;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by alex on 10/6/15.
@@ -333,14 +336,8 @@ public class StudentDataHandler implements
             //select * from work_table where created_date beween to_date('9/18/2007','MM/DD/YYYY') and to_date('03/29/2008','MM/DD/YYYY')
             connection.open();
 
-            SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.WEEK_OF_YEAR, week - 1);
-
-            String startDate = format.format(calendar.getTime());
-            calendar.set(Calendar.WEEK_OF_YEAR, week);
-            String endDate = format.format(calendar.getTime());
+            String startDate = DateUtil.getStartDate(year, week);
+            String endDate = DateUtil.getEndDate(year, week);
 
             // get all courses+instances in this week
 

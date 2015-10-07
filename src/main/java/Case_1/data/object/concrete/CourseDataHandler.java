@@ -10,11 +10,11 @@ import Case_1.domain.concrete.CourseInstance;
 import Case_1.domain.concrete.Student;
 import Case_1.logic.concrete.CourseBuilder;
 import Case_1.logic.concrete.StudentBuilder;
+import Case_1.util.DateUtil;
 import Case_1.util.i18n.LangUtil;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -252,14 +252,8 @@ public class CourseDataHandler implements
             //select * from work_table where created_date beween to_date('9/18/2007','MM/DD/YYYY') and to_date('03/29/2008','MM/DD/YYYY')
             connection.open();
 
-            SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.WEEK_OF_YEAR, week - 1);
-
-            String startDate = format.format(calendar.getTime());
-            calendar.set(Calendar.WEEK_OF_YEAR, week);
-            String endDate = format.format(calendar.getTime());
+            String startDate = DateUtil.getStartDate(year, week);
+            String endDate = DateUtil.getEndDate(year, week);
 
             String sql = "SELECT * FROM COURSEINSTANCE WHERE STARTDATE between to_date(?,'DD/MM/YYYY') and to_date(?,'DD/MM/YYYY')";
             SQLQuery query = new SQLQuery();

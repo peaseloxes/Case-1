@@ -1,6 +1,7 @@
 package Case_1.util;
 
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -34,6 +35,24 @@ public class DateUtil {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(Date.valueOf(getYearWeekDate(year, week).minusWeeks(1)));
         return "/" + calendar.get(Calendar.YEAR) + "/" + calendar.get(Calendar.WEEK_OF_YEAR);
+    }
+
+    public static String getStartDate(final int year, final int week){
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.WEEK_OF_YEAR, week - 1);
+
+        return format.format(calendar.getTime());
+    }
+
+    public static String getEndDate(final int year, final int week){
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.WEEK_OF_YEAR, week);
+
+        return format.format(calendar.getTime());
     }
 
     /**
